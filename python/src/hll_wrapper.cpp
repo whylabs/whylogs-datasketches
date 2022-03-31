@@ -20,6 +20,7 @@
 #include "hll.hpp"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 
@@ -39,6 +40,30 @@ py::object hll_sketch_serialize_compact(const hll_sketch& sk) {
 py::object hll_sketch_serialize_updatable(const hll_sketch& sk) {
   auto serResult = sk.serialize_updatable();
   return py::bytes((char*)serResult.data(), serResult.size());
+}
+
+void hll_sketch_update_double(hll_sketch& sk, py::array_t<double, py::array::c_style | py::array::forcecast> items) {
+  if (items.ndim() != 1) {
+    throw std::invalid_argument("input data must have only one dimension. Found: "
+          + std::to_string(items.ndim()));
+  }
+
+  auto data = items.template unchecked<1>();
+  for (uint32_t i = 0; i < data.size(); ++i) {
+    sk.update(data(i));
+  }
+}
+
+void hll_sketch_update_int(hll_sketch& sk, py::array_t<int64_t, py::array::c_style | py::array::forcecast> items) {
+  if (items.ndim() != 1) {
+    throw std::invalid_argument("input data must have only one dimension. Found: "
+          + std::to_string(items.ndim()));
+  }
+
+  auto data = items.template unchecked<1>();
+  for (uint32_t i = 0; i < data.size(); ++i) {
+    sk.update(data(i));
+  }
 }
 
 }
@@ -101,6 +126,10 @@ void init_hll(py::module &m) {
     .def_static("get_rel_err", &hll_sketch::get_rel_err,
          py::arg("upper_bound"), py::arg("unioned"), py::arg("lg_k"), py::arg("num_std_devs"),
          "Retuns the a priori relative error bound for the given parameters")
+    .def("batch_update_double", &dspy::hll_sketch_update_double, py::arg("array"),
+         "Update doubles in batch")
+    .def("batch_update_int", &dspy::hll_sketch_update_int, py::arg("array"),
+         "Update ints in batch")
     ;
 
   py::class_<hll_union>(m, "hll_union")

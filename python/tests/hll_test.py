@@ -97,6 +97,18 @@ class HllTest(unittest.TestCase):
         hll.reset()
         self.assertTrue(hll.is_empty())
 
+    def test_hll_batch_update(self):
+        k = 7
+        n = 53
+        
+        sk = self.generate_sketch(n, k, tgt_hll_type.HLL_4, 0)
+        import numpy as np
+        data = np.arange(0, 10*1000*1000, dtype=float)
+        sk.batch_update_double(data)
+        data = np.arange(0, 10*1000*1000, dtype=int)
+        sk.batch_update_int(data)
+        self.assertFalse(sk.is_empty())
+
     def test_hll_union(self):
         k = 7
         n = 53
