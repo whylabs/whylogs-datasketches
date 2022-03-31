@@ -107,8 +107,9 @@ add_subdirectory(sampling)
 add_subdirectory(tuple)
 add_subdirectory(req)
 
-# we always build for Python
-add_subdirectory(python)
+if (WITH_PYTHON)
+  add_subdirectory(python)
+endif()
 
 target_link_libraries(datasketches INTERFACE hll cpc kll fi theta sampling)
 
