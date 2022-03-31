@@ -16,7 +16,7 @@
 # under the License.
   
 import unittest
-from datasketches import cpc_sketch, cpc_union
+from whylogs_datasketches import cpc_sketch, cpc_union
 
 class CpcTest(unittest.TestCase):
   def test_cpc_example(self):

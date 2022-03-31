@@ -16,7 +16,7 @@
 # under the License.
  
 import unittest
-from datasketches import var_opt_sketch, var_opt_union
+from whylogs_datasketches import var_opt_sketch, var_opt_union
 
 class VoTest(unittest.TestCase):
   def test_vo_example(self):

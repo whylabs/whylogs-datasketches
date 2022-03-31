@@ -16,7 +16,7 @@
 # under the License.
  
 import unittest
-from datasketches import frequent_strings_sketch, frequent_items_error_type
+from whylogs_datasketches import frequent_strings_sketch, frequent_items_error_type
 
 class FiTest(unittest.TestCase):
   def test_fi_example(self):

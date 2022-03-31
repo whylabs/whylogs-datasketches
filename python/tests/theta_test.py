@@ -17,10 +17,10 @@
  
 import unittest
 
-from datasketches import theta_sketch, update_theta_sketch
-from datasketches import compact_theta_sketch, theta_union
-from datasketches import theta_intersection, theta_a_not_b
-from datasketches import theta_jaccard_similarity
+from whylogs_datasketches import theta_sketch, update_theta_sketch
+from whylogs_datasketches import compact_theta_sketch, theta_union
+from whylogs_datasketches import theta_intersection, theta_a_not_b
+from whylogs_datasketches import theta_jaccard_similarity
 
 class ThetaTest(unittest.TestCase):
     def test_theta_basic_example(self):

@@ -16,7 +16,7 @@
 # under the License.
 
 import unittest
-from datasketches import kll_ints_sketch, kll_floats_sketch
+from whylogs_datasketches import kll_ints_sketch, kll_floats_sketch
 import numpy as np
 
 class KllTest(unittest.TestCase):

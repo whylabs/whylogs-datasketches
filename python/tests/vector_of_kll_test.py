@@ -16,7 +16,7 @@
 # under the License.
 
 import unittest
-from datasketches import (vector_of_kll_ints_sketches,
+from whylogs_datasketches import (vector_of_kll_ints_sketches,
                           vector_of_kll_floats_sketches)
 import numpy as np
 
