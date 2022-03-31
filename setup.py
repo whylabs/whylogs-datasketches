@@ -80,19 +80,19 @@ class CMakeBuild(build_ext):
         print() # add an empty line to pretty print
 
 setup(
-    name='whylabs-datasketches',
+    name='whylogs-datasketches',
     version='3.4.0.dev0',
     author='Apache Software Foundation',
-    author_email='dev@datasketches.apache.org',
-    description='The Apache DataSketches Library for Python',
+    author_email='support@whylabs.ai',
+    description='The fork for whylogs for Apache DataSketches Library for Python',
     license='Apache License 2.0',
-    url='http://datasketches.apache.org',
+    url='https://github.com/whylabs/whylogs-datasketches',
     long_description=open('python/README.md').read(),
     long_description_content_type='text/markdown',
     packages=find_packages('python'), # python pacakges only in this dir
     package_dir={'':'python'},
     # may need to add all source paths for sdist packages w/o MANIFEST.in
-    ext_modules=[CMakeExtension('whylabs-datasketches')],
+    ext_modules=[CMakeExtension('whylogs-datasketches')],
     cmdclass={'build_ext': CMakeBuild},
     install_requires=['numpy'],
     zip_safe=False

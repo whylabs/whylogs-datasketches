@@ -45,7 +45,7 @@ target_link_libraries(python
 
 set_target_properties(python PROPERTIES
   PREFIX ""
-  OUTPUT_NAME datasketches
+  OUTPUT_NAME whylogs_datasketches
 )
 
 # ensure we make a .so on Mac rather than .dylib

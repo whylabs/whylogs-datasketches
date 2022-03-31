@@ -1,2 +1,2 @@
-name = "datasketches"
+name = "whylogs_datasketches"
  
