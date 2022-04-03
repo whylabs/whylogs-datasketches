@@ -25,6 +25,8 @@
 #include <sstream>
 #include <vector>
 #include <stdexcept>
+#include <arrow/api.h>
+#include <arrow/python/pyarrow.h>
 
 namespace py = pybind11;
 
@@ -142,6 +144,7 @@ namespace dspy = datasketches::python;
 template<typename T>
 void bind_kll_sketch(py::module &m, const char* name) {
   using namespace datasketches;
+  arrow::py::import_pyarrow();
 
   py::class_<kll_sketch<T>>(m, name)
     .def(py::init<uint16_t>(), py::arg("k")=kll_constants::DEFAULT_K)

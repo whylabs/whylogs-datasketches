@@ -17,6 +17,8 @@
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
+message(STATUS "Python ${Python3_SITELIB}")
+
 # only Windows+MSVC seems to have trouble locating pybind11
 if (MSVC)
   execute_process(COMMAND cmd.exe /c ${CMAKE_CURRENT_SOURCE_DIR}/pybind11Path.cmd "${Python3_EXECUTABLE}"
@@ -27,6 +29,7 @@ if (MSVC)
 endif()
 
 find_package(pybind11 CONFIG REQUIRED)
+include_directories("${Python3_SITELIB}/pyarrow/include/")
 
 pybind11_add_module(python MODULE EXCLUDE_FROM_ALL THIN_LTO)
 
@@ -41,6 +44,7 @@ target_link_libraries(python
     sampling
     req
     pybind11::module
+    arrow_shared
 )
 
 set_target_properties(python PROPERTIES
