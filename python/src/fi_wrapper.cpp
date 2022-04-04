@@ -20,6 +20,7 @@
 #include "frequent_items_sketch.hpp"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <sstream>
 
 namespace py = pybind11;
@@ -64,6 +65,22 @@ py::list fi_sketch_get_frequent_items(const frequent_items_sketch<T>& sk,
   return list;
 }
 
+// maybe possible to disambiguate the static vs method get_epsilon calls, but
+// this is easier for now
+template<typename T, typename V>
+void update_num_array(frequent_items_sketch<T> &sk, py::array_t<V, py::array::c_style | py::array::forcecast> items) {
+  if (items.ndim() != 1) {
+    throw std::invalid_argument("input data must have only one dimension. Found: "
+          + std::to_string(items.ndim()));
+  }
+  
+  auto data = items.template unchecked<1>();
+  
+  for (uint32_t i = 0; i < data.size(); i++) {
+    sk.update(std::to_string(data(i)), 1.0);
+  }
+}
+
 }
 }
 
@@ -80,6 +97,10 @@ void bind_fi_sketch(py::module &m, const char* name) {
     .def("to_string", &frequent_items_sketch<T>::to_string, py::arg("print_items")=false,
          "Produces a string summary of the sketch")
     .def("update", (void (frequent_items_sketch<T>::*)(const T&, uint64_t)) &frequent_items_sketch<T>::update, py::arg("item"), py::arg("weight")=1,
+         "Updates the sketch with the given string and, optionally, a weight")
+    .def("update_numbers", dspy::update_num_array<T, double>, py::arg("array"),
+         "Updates the sketch with the given string and, optionally, a weight")
+    .def("update_numbers", dspy::update_num_array<T, int64_t>, py::arg("array"),
          "Updates the sketch with the given string and, optionally, a weight")
     .def("get_frequent_items", &dspy::fi_sketch_get_frequent_items<T>, py::arg("err_type"), py::arg("threshold")=0)
     .def("merge", (void (frequent_items_sketch<T>::*)(const frequent_items_sketch<T>&)) &frequent_items_sketch<T>::merge,
