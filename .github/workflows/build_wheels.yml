@@ -79,6 +79,8 @@ jobs:
         run: python -m cibuildwheel --output-dir dist
         env:
           CIBW_SKIP: "*-win32"
+          CIBW_BUILD: "cp37-*64 cp38-*64 cp38-*64 cp39-*64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
           CIBW_ARCHS_MACOS: "x86_64 universal2"
 
       - uses: actions/upload-artifact@v2
