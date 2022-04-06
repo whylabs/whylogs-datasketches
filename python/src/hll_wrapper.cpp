@@ -66,6 +66,11 @@ void hll_sketch_update_int(hll_sketch& sk, py::array_t<int64_t, py::array::c_sty
   }
 }
 
+void hll_sketch_update_str(hll_sketch& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(obj.cast<std::string>());
+  }
+}
 }
 }
 
@@ -130,6 +135,8 @@ void init_hll(py::module &m) {
          "Update doubles in batch")
     .def("batch_update_int", &dspy::hll_sketch_update_int, py::arg("array"),
          "Update ints in batch")
+    .def("batch_update_str", &dspy::hll_sketch_update_str, py::arg("str_list"),
+         "Update list of strings in batch")
     ;
 
   py::class_<hll_union>(m, "hll_union")
