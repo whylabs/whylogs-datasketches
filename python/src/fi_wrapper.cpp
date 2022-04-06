@@ -99,9 +99,9 @@ void bind_fi_sketch(py::module &m, const char* name) {
     .def("update", (void (frequent_items_sketch<T>::*)(const T&, uint64_t)) &frequent_items_sketch<T>::update, py::arg("item"), py::arg("weight")=1,
          "Updates the sketch with the given string and, optionally, a weight")
     .def("update_numbers", dspy::update_num_array<T, double>, py::arg("array"),
-         "Updates the sketch with the given string and, optionally, a weight")
+         "Update the sketch with a ndarray of numbers")
     .def("update_numbers", dspy::update_num_array<T, int64_t>, py::arg("array"),
-         "Updates the sketch with the given string and, optionally, a weight")
+         "Update the sketch with a ndarray of numbers")
     .def("get_frequent_items", &dspy::fi_sketch_get_frequent_items<T>, py::arg("err_type"), py::arg("threshold")=0)
     .def("merge", (void (frequent_items_sketch<T>::*)(const frequent_items_sketch<T>&)) &frequent_items_sketch<T>::merge,
          "Merges the given sketch into this one")
