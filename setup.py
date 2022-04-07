@@ -81,7 +81,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='whylogs-datasketches',
-    version='3.4.0.dev3',
+    version='3.4.0.dev4',
     author='Apache Software Foundation',
     author_email='support@whylabs.ai',
     description='The fork for whylogs for Apache DataSketches Library for Python',
@@ -89,8 +89,9 @@ setup(
     url='https://github.com/whylabs/whylogs-datasketches',
     long_description=open('python/README.md').read(),
     long_description_content_type='text/markdown',
-    packages=find_packages('python'), # python pacakges only in this dir
+    packages=find_packages(include='python', exclude=["python/tests"]), # python pacakges only in this dir
     package_dir={'':'python'},
+    exclude=["*.tests", "*.tests.*", "tests.*", "tests"],    # may need to add all source paths for sdist packages w/o MANIFEST.in
     ext_modules=[CMakeExtension('whylogs-datasketches')],
     cmdclass={'build_ext': CMakeBuild},
     install_requires=[],
