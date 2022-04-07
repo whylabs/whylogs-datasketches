@@ -16,6 +16,8 @@
 # under the License.
  
 import unittest
+import numpy as np
+
 from whylogs_datasketches import hll_sketch, hll_union, tgt_hll_type
 
 class HllTest(unittest.TestCase):
@@ -102,11 +104,19 @@ class HllTest(unittest.TestCase):
         n = 53
         
         sk = self.generate_sketch(n, k, tgt_hll_type.HLL_4, 0)
-        import numpy as np
-        data = np.arange(0, 10*1000*1000, dtype=float)
-        sk.batch_update_double(data)
-        data = np.arange(0, 10*1000*1000, dtype=int)
-        sk.batch_update_int(data)
+        data = np.arange(0, 1000, dtype=float)
+        sk.update_np(data)
+        sk.update_np(data)
+        self.assertFalse(sk.is_empty())
+
+    def test_hll_batch_update_list(self):
+        k = 7
+        n = 53
+        
+        sk = self.generate_sketch(n, k, tgt_hll_type.HLL_4, 0)
+        sk.update_str_list(["1", "2", "3", "4"])
+        sk.update_int_list([1, 2, 3, 4])
+        sk.update_double_list([1.0, 2.0, 3.0, 4.0])
         self.assertFalse(sk.is_empty())
 
     def test_hll_union(self):

@@ -42,7 +42,8 @@ py::object hll_sketch_serialize_updatable(const hll_sketch& sk) {
   return py::bytes((char*)serResult.data(), serResult.size());
 }
 
-void hll_sketch_update_double(hll_sketch& sk, py::array_t<double, py::array::c_style | py::array::forcecast> items) {
+template<typename T>
+void hll_sketch_update_ndarray(hll_sketch& sk, py::array_t<T, py::array::c_style | py::array::forcecast> items) {
   if (items.ndim() != 1) {
     throw std::invalid_argument("input data must have only one dimension. Found: "
           + std::to_string(items.ndim()));
@@ -54,21 +55,21 @@ void hll_sketch_update_double(hll_sketch& sk, py::array_t<double, py::array::c_s
   }
 }
 
-void hll_sketch_update_int(hll_sketch& sk, py::array_t<int64_t, py::array::c_style | py::array::forcecast> items) {
-  if (items.ndim() != 1) {
-    throw std::invalid_argument("input data must have only one dimension. Found: "
-          + std::to_string(items.ndim()));
-  }
-
-  auto data = items.template unchecked<1>();
-  for (uint32_t i = 0; i < data.size(); ++i) {
-    sk.update(data(i));
-  }
-}
-
-void hll_sketch_update_str(hll_sketch& sk, const py::list items) {
+void hll_sketch_update_str_list(hll_sketch& sk, const py::list items) {
   for(py::handle obj : items) {
     sk.update(obj.cast<std::string>());
+  }
+}
+
+void hll_sketch__update_int_list(hll_sketch& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(std::to_string(obj.cast<int64_t>()));
+  }
+}
+
+void hll_sketch_update_double_list(hll_sketch& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(std::to_string(obj.cast<double>()));
   }
 }
 }
@@ -131,12 +132,16 @@ void init_hll(py::module &m) {
     .def_static("get_rel_err", &hll_sketch::get_rel_err,
          py::arg("upper_bound"), py::arg("unioned"), py::arg("lg_k"), py::arg("num_std_devs"),
          "Retuns the a priori relative error bound for the given parameters")
-    .def("batch_update_double", &dspy::hll_sketch_update_double, py::arg("array"),
-         "Update doubles in batch")
-    .def("batch_update_int", &dspy::hll_sketch_update_int, py::arg("array"),
-         "Update ints in batch")
-    .def("batch_update_str", &dspy::hll_sketch_update_str, py::arg("str_list"),
+    .def("update_np", &dspy::hll_sketch_update_ndarray<double>, py::arg("array"),
+         "Update with a np array of doubles")
+    .def("update_np", &dspy::hll_sketch_update_ndarray<int64_t>, py::arg("array"),
+         "Update with a np array of ints")
+    .def("update_str_list", &dspy::hll_sketch_update_str_list, py::arg("str_list"),
          "Update list of strings in batch")
+    .def("update_int_list", &dspy::hll_sketch__update_int_list, py::arg("int_list"),
+         "Update list of strings in ints")
+    .def("update_double_list", &dspy::hll_sketch_update_double_list, py::arg("double_list"),
+         "Update list of strings in double")
     ;
 
   py::class_<hll_union>(m, "hll_union")

@@ -16,7 +16,7 @@
 # under the License.
 
 import unittest
-from whylogs_datasketches import kll_ints_sketch, kll_floats_sketch
+from whylogs_datasketches import kll_ints_sketch, kll_floats_sketch, kll_doubles_sketch
 import numpy as np
 
 class KllTest(unittest.TestCase):
@@ -114,6 +114,13 @@ class KllTest(unittest.TestCase):
       k = 75
       kll = kll_floats_sketch(k)
       self.assertTrue(kll.is_empty())
+
+    def test_kll_doubles_sketch(self):
+      # already tested floats and it's templatized, so just make sure it instantiates properly
+      k = 75
+      kll = kll_doubles_sketch(k)
+      self.assertTrue(kll.is_empty())
+
 
 if __name__ == '__main__':
     unittest.main()
