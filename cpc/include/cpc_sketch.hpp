@@ -78,6 +78,11 @@ public:
   uint8_t get_lg_k() const;
 
   /**
+   * @return configured seed of this sketch
+   */
+  uint8_t get_seed() const;
+
+  /**
    * @return true if this sketch represents an empty set
    */
   bool is_empty() const;

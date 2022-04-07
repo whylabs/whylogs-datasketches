@@ -58,12 +58,6 @@ void cpc_sketch_update(cpc_sketch& sk, py::array_t<T, py::array::c_style | py::a
   }
 }
 
-void cpc_sketch_update_str_list(cpc_sketch& sk, const py::list items) {
-  for(py::handle obj : items) {
-    sk.update(obj.cast<std::string>());
-  }
-}
-
 template<typename T>
 void cpc_sketch_update_list(cpc_sketch& sk, const py::list items) {
   for(py::handle obj : items) {
@@ -90,12 +84,17 @@ void init_cpc(py::module &m) {
          "Serializes the sketch into a bytes object")
     .def_static("deserialize", &dspy::cpc_sketch_deserialize,
          "Reads a bytes object and returns the corresponding cpc_sketch")
+    .def_static("get_max_serialized_size_bytes", &cpc_sketch::get_max_serialized_size_bytes, py::arg("lg_k"), "Returns a CPC sketch with the result of the union")
     .def<void (cpc_sketch::*)(uint64_t)>("update", &cpc_sketch::update, py::arg("datum"),
          "Updates the sketch with the given 64-bit integer value")
     .def<void (cpc_sketch::*)(double)>("update", &cpc_sketch::update, py::arg("datum"),
          "Updates the sketch with the given 64-bit floating point")
     .def<void (cpc_sketch::*)(const std::string&)>("update", &cpc_sketch::update, py::arg("datum"),
          "Updates the sketch with the given string")
+    .def("get_lg_k", &cpc_sketch::get_lg_k,
+         "Get lg_k value of the sketch")
+    .def("get_seed", &cpc_sketch::get_seed,
+         "Get the seed value of the sketch")
     .def("is_empty", &cpc_sketch::is_empty,
          "Returns True if the sketch is empty, otherwise Dalse")
     .def("get_estimate", &cpc_sketch::get_estimate,

@@ -72,6 +72,10 @@ class CpcTest(unittest.TestCase):
     cpc.update_int_list([1, 2, 3, 4])
     cpc.update_double_list([1.0, 2.0, 3.0, 4.0])
     cpc.update_str_list(["a", "b", "c", "d"])
+    print(cpc.get_lg_k())
+    print(cpc.get_seed())
+    print(cpc_sketch.get_max_serialized_size_bytes(12))
+    
 
 if __name__ == '__main__':
     unittest.main()

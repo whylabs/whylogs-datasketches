@@ -67,6 +67,11 @@ uint8_t cpc_sketch_alloc<A>::get_lg_k() const {
 }
 
 template<typename A>
+uint8_t cpc_sketch_alloc<A>::get_seed() const {
+  return seed;
+}
+
+template<typename A>
 bool cpc_sketch_alloc<A>::is_empty() const {
   return num_coupons == 0;
 }
