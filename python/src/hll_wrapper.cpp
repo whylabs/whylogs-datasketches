@@ -55,23 +55,14 @@ void hll_sketch_update_ndarray(hll_sketch& sk, py::array_t<T, py::array::c_style
   }
 }
 
-void hll_sketch_update_str_list(hll_sketch& sk, const py::list items) {
+template<typename T>
+void hll_sketch_update_list(hll_sketch& sk, const py::list items) {
   for(py::handle obj : items) {
-    sk.update(obj.cast<std::string>());
+    sk.update(obj.cast<T>());    
   }
 }
 
-void hll_sketch__update_int_list(hll_sketch& sk, const py::list items) {
-  for(py::handle obj : items) {
-    sk.update(std::to_string(obj.cast<int64_t>()));
-  }
-}
 
-void hll_sketch_update_double_list(hll_sketch& sk, const py::list items) {
-  for(py::handle obj : items) {
-    sk.update(std::to_string(obj.cast<double>()));
-  }
-}
 }
 }
 
@@ -136,12 +127,12 @@ void init_hll(py::module &m) {
          "Update with a np array of doubles")
     .def("update_np", &dspy::hll_sketch_update_ndarray<int64_t>, py::arg("array"),
          "Update with a np array of ints")
-    .def("update_str_list", &dspy::hll_sketch_update_str_list, py::arg("str_list"),
+    .def("update_str_list", &dspy::hll_sketch_update_list<std::string>, py::arg("str_list"),
          "Update list of strings in batch")
-    .def("update_int_list", &dspy::hll_sketch__update_int_list, py::arg("int_list"),
-         "Update list of strings in ints")
-    .def("update_double_list", &dspy::hll_sketch_update_double_list, py::arg("double_list"),
-         "Update list of strings in double")
+    .def("update_int_list", &dspy::hll_sketch_update_list<int64_t>, py::arg("int_list"),
+         "Update list of ints.")
+    .def("update_double_list", &dspy::hll_sketch_update_list<double>, py::arg("double_list"),
+         "Update list of doubles.")
     ;
 
   py::class_<hll_union>(m, "hll_union")

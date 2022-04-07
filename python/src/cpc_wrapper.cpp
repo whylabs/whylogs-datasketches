@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 #include "cpc_sketch.hpp"
 #include "cpc_union.hpp"
@@ -42,6 +43,32 @@ py::object cpc_sketch_serialize(const cpc_sketch& sk) {
 
 cpc_sketch* cpc_union_get_result(const cpc_union& u) {
   return new cpc_sketch(u.get_result());
+}
+
+template<typename T>
+void cpc_sketch_update(cpc_sketch& sk, py::array_t<T, py::array::c_style | py::array::forcecast> items) {
+  if (items.ndim() != 1) {
+    throw std::invalid_argument("input data must have only one dimension. Found: "
+          + std::to_string(items.ndim()));
+  }
+  
+  auto data = items.template unchecked<1>();
+  for (uint32_t i = 0; i < data.size(); ++i) {
+    sk.update(data(i));
+  }
+}
+
+void cpc_sketch_update_str_list(cpc_sketch& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(obj.cast<std::string>());
+  }
+}
+
+template<typename T>
+void cpc_sketch_update_list(cpc_sketch& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(obj.cast<T>());    
+  }
 }
 
 }
@@ -77,6 +104,17 @@ void init_cpc(py::module &m) {
          "Returns an approximate lower bound on the estimate for kappa values in {1, 2, 3}, roughly corresponding to standard deviations")
     .def("get_upper_bound", &cpc_sketch::get_upper_bound, py::arg("kappa"),
          "Returns an approximate upper bound on the estimate for kappa values in {1, 2, 3}, roughly corresponding to standard deviations")
+    .def("update_np", &dspy::cpc_sketch_update<double>, py::arg("array"),
+         "Update with a np array of doubles")
+    .def("update_np", &dspy::cpc_sketch_update<int64_t>, py::arg("array"),
+         "Update with a np array of ints")
+    .def("update_str_list", &dspy::cpc_sketch_update_list<std::string>, py::arg("str_list"),
+         "Update list of strings")
+    .def("update_int_list", &dspy::cpc_sketch_update_list<int64_t>, py::arg("int_list"),
+         "Update list of ints")
+    .def("update_double_list", &dspy::cpc_sketch_update_list<double>, py::arg("double_list"),
+         "Update list of double")
+
     ;
 
   py::class_<cpc_union>(m, "cpc_union")

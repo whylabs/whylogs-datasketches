@@ -89,17 +89,10 @@ void fi_sketch_update_str_list(frequent_items_sketch<T> &sk, const py::list item
   }
 }
 
-template<typename T>
-void fi_sketch_update_int_list(frequent_items_sketch<T> &sk, const py::list items) {
+template<typename T, typename V>
+void fi_sketch_update_number_list(frequent_items_sketch<T> &sk, const py::list items) {
   for(py::handle obj : items) {
-    sk.update(std::to_string(obj.cast<int64_t>()), 1.0);
-  }
-}
-
-template<typename T>
-void fi_sketch_update_double_list(frequent_items_sketch<T> &sk, const py::list items) {
-  for(py::handle obj : items) {
-    sk.update(std::to_string(obj.cast<double>()), 1.0);
+    sk.update(std::to_string(obj.cast<V>()), 1.0);
   }
 }
 
@@ -125,8 +118,8 @@ void bind_fi_sketch(py::module &m, const char* name) {
     .def("update_np", &dspy::fi_sketch_update_num_array<T, int64_t>, py::arg("array"),
          "Update the sketch with a ndarray of numbers")
     .def("update_str_list", &dspy::fi_sketch_update_str_list<T>, py::arg("str_list"), "Update the sketch with a list of strings")
-    .def("update_int_list", &dspy::fi_sketch_update_int_list<T>, py::arg("int_list"), "Update the sketch with a list of ints")
-    .def("update_double_list", &dspy::fi_sketch_update_double_list<T>, py::arg("double_list"), "Update the sketch with a list of doubles")
+    .def("update_int_list", &dspy::fi_sketch_update_number_list<T, int64_t>, py::arg("int_list"), "Update the sketch with a list of ints")
+    .def("update_double_list", &dspy::fi_sketch_update_number_list<T, double>, py::arg("double_list"), "Update the sketch with a list of doubles")
     .def("get_frequent_items", &dspy::fi_sketch_get_frequent_items<T>, py::arg("err_type"), py::arg("threshold")=0)
     .def("merge", (void (frequent_items_sketch<T>::*)(const frequent_items_sketch<T>&)) &frequent_items_sketch<T>::merge,
          "Merges the given sketch into this one")
