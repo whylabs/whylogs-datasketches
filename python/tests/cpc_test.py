@@ -16,6 +16,7 @@
 # under the License.
   
 import unittest
+import numpy as np
 from whylogs_datasketches import cpc_sketch, cpc_union
 
 class CpcTest(unittest.TestCase):
@@ -59,6 +60,18 @@ class CpcTest(unittest.TestCase):
     sk_bytes = result.serialize()
     new_cpc = cpc_sketch.deserialize(sk_bytes)
     self.assertFalse(new_cpc.is_empty())
+
+  def test_cpc_numpy_apis(self):
+    cpc  = cpc_sketch(12)
+    cpc.update_np(np.array([1, 2, 3, 4], int))
+    cpc.update_np(np.array([1, 2, 3, 4], float))
+
+
+  def test_cpc_list_apis(self):
+    cpc  = cpc_sketch(12)
+    cpc.update_int_list([1, 2, 3, 4])
+    cpc.update_double_list([1.0, 2.0, 3.0, 4.0])
+    cpc.update_str_list(["a", "b", "c", "d"])
 
 if __name__ == '__main__':
     unittest.main()

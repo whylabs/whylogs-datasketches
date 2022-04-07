@@ -134,6 +134,13 @@ void kll_sketch_update(kll_sketch<T>& sk, py::array_t<T, py::array::c_style | py
   }
 }
 
+template<typename T>
+void kll_sketch_update_num_list(kll_sketch<T>& sk, const py::list items) {
+  for(py::handle obj : items) {
+    sk.update(obj.cast<double>());
+  }
+}
+
 }
 }
 
@@ -150,6 +157,8 @@ void bind_kll_sketch(py::module &m, const char* name) {
          "Updates the sketch with the given value")
     .def("update", &dspy::kll_sketch_update<T>, py::arg("array"),
          "Updates the sketch with the values in the given array")
+    .def("update_list", &dspy::kll_sketch_update_num_list<T>, py::arg("num_items"),
+         "Updates the sketch with the values in a list")
     .def("merge", (void (kll_sketch<T>::*)(const kll_sketch<T>&)) &kll_sketch<T>::merge, py::arg("sketch"),
          "Merges the provided sketch into the this one")
     .def("__str__", &kll_sketch<T>::to_string, py::arg("print_levels")=false, py::arg("print_items")=false,
@@ -242,4 +251,5 @@ void bind_kll_sketch(py::module &m, const char* name) {
 void init_kll(py::module &m) {
   bind_kll_sketch<int>(m, "kll_ints_sketch");
   bind_kll_sketch<float>(m, "kll_floats_sketch");
+  bind_kll_sketch<double>(m, "kll_doubles_sketch");
 }

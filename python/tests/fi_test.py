@@ -16,6 +16,7 @@
 # under the License.
  
 import unittest
+import numpy as np
 from whylogs_datasketches import frequent_strings_sketch, frequent_items_error_type
 
 class FiTest(unittest.TestCase):
@@ -105,6 +106,28 @@ class FiTest(unittest.TestCase):
     sk_apriori_error = fi.get_sketch_epsilon() * wt
     reference_apriori_error = frequent_strings_sketch.get_apriori_error(k, wt)
     self.assertAlmostEqual(sk_apriori_error, reference_apriori_error, delta=1e-6)
+
+
+  def test_fi_sketch_batch_numpy(self):
+    # only testing a few things not used in the above example
+    k = 12
+    wt = 10000
+    fi = frequent_strings_sketch(k)
+
+    fi.update_np(np.array([0.0, 1.0, 2.0], float))
+    fi.update_np(np.array([0.0, 1.0, 2.0], int))
+
+  def test_fi_sketch_batch_list(self):
+    # only testing a few things not used in the above example
+    k = 12
+    wt = 10000
+    fi = frequent_strings_sketch(k)
+
+    fi.update_str_list(["a", "b", "c", "d"])
+    fi.update_int_list([1, 2, 3, 4])
+    fi.update_double_list([1.0, 2.0, 3.0, 4.0])
+
+
 
 if __name__ == '__main__':
   unittest.main()
