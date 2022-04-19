@@ -169,6 +169,19 @@ class kll_sketch {
     using value_type = T;
     using comparator = C;
 
+    A allocator_;
+    uint16_t k_;
+    uint8_t m_; // minimum buffer "width"
+    uint16_t min_k_; // for error estimation after merging with different k
+    uint64_t n_;
+    uint8_t num_levels_;
+    vector_u32<A> levels_;
+    T* items_;
+    uint32_t items_size_;
+    T* min_value_;
+    T* max_value_;
+    bool is_level_zero_sorted_;
+
     static const uint8_t DEFAULT_M = 8;
     // TODO: Redundant and deprecated. Will be remove din next major version.
     static const uint16_t DEFAULT_K = kll_constants::DEFAULT_K;
@@ -443,6 +456,8 @@ class kll_sketch {
      */
     vector_bytes serialize(unsigned header_size_bytes = 0) const;
 
+    kll_sketch<double> to_doubles() const;
+
     /**
      * This method deserializes a sketch from a given stream.
      * @param is input stream
@@ -487,7 +502,7 @@ class kll_sketch {
     T* get_items() { return items_; }
     #endif
 
-  private:
+  protected:
     /* Serialized sketch layout:
      *  Adr:
      *      ||    7    |   6   |    5   |    4   |    3   |    2    |    1   |      0       |
@@ -511,18 +526,7 @@ class kll_sketch {
     static const uint8_t PREAMBLE_INTS_SHORT = 2; // for empty and single item
     static const uint8_t PREAMBLE_INTS_FULL = 5;
 
-    A allocator_;
-    uint16_t k_;
-    uint8_t m_; // minimum buffer "width"
-    uint16_t min_k_; // for error estimation after merging with different k
-    uint64_t n_;
-    uint8_t num_levels_;
-    vector_u32<A> levels_;
-    T* items_;
-    uint32_t items_size_;
-    T* min_value_;
-    T* max_value_;
-    bool is_level_zero_sorted_;
+ 
 
     // for deserialization
     class item_deleter;
