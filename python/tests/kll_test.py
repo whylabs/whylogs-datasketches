@@ -121,6 +121,14 @@ class KllTest(unittest.TestCase):
       kll = kll_doubles_sketch(k)
       self.assertTrue(kll.is_empty())
 
+    def test_kll_floats_to_doubles(self):
+      # test if we can convert between floats and doubles
+      k = 75
+      kll = kll_floats_sketch(k)
+      kll.update_list(list(range(0, 1000)))
+
+      dkll = kll_floats_sketch.float_to_doubles(kll)
+      self.assertFalse(dkll.is_empty())
 
 if __name__ == '__main__':
     unittest.main()

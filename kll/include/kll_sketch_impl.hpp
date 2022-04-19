@@ -1035,6 +1035,39 @@ string<A> kll_sketch<T, C, S, A>::to_string(bool print_levels, bool print_items)
 }
 
 template <typename T, typename C, typename S, typename A>
+kll_sketch<double> kll_sketch<T, C, S, A>::to_doubles() const {
+  auto dsk = kll_sketch<double>(k_);
+  if (is_empty()) {
+    return dsk;
+  }
+  
+  dsk.min_k_ = min_k_;
+  dsk.n_ = n_;
+  dsk.m_ = m_;
+  dsk.is_level_zero_sorted_ = is_level_zero_sorted_;
+
+  dsk.min_value_ = new (dsk.allocator_.allocate(1)) double(get_min_value());
+  dsk.max_value_ = new (dsk.allocator_.allocate(1)) double(get_max_value());
+
+  // dsk.allocate_new_capacity(items_size_, num_levels_, min_value, max_value);
+  dsk.allocator_.deallocate(dsk.items_, dsk.items_size_);
+  dsk.items_ = dsk.allocator_.allocate(items_size_);
+  for (uint32_t i = 0; i < items_size_; i++) {
+    dsk.items_[i] = static_cast<double>(items_[i]);
+  }
+  dsk.items_size_ = items_size_;
+
+  dsk.num_levels_ = num_levels_;
+  dsk.levels_.resize(num_levels_); 
+  for (uint32_t i = 0; i < num_levels_; i++) {
+    dsk.levels_[i] = levels_[i];
+  }
+
+  
+  return dsk;
+}
+
+template <typename T, typename C, typename S, typename A>
 typename kll_sketch<T, C, S, A>::const_iterator kll_sketch<T, C, S, A>::begin() const {
   return kll_sketch<T, C, S, A>::const_iterator(items_, levels_.data(), num_levels_);
 }
