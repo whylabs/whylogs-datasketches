@@ -1049,7 +1049,6 @@ kll_sketch<double> kll_sketch<T, C, S, A>::to_doubles() const {
   dsk.min_value_ = new (dsk.allocator_.allocate(1)) double(get_min_value());
   dsk.max_value_ = new (dsk.allocator_.allocate(1)) double(get_max_value());
 
-  // dsk.allocate_new_capacity(items_size_, num_levels_, min_value, max_value);
   dsk.allocator_.deallocate(dsk.items_, dsk.items_size_);
   dsk.items_ = dsk.allocator_.allocate(items_size_);
   for (uint32_t i = 0; i < items_size_; i++) {
