@@ -81,7 +81,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='whylogs-datasketches',
-    version='3.4.0.dev4',
+    version='3.4.0.dev5',
     author='Apache Software Foundation',
     author_email='support@whylabs.ai',
     description='The fork for whylogs for Apache DataSketches Library for Python',
