@@ -1057,12 +1057,11 @@ kll_sketch<double> kll_sketch<T, C, S, A>::to_doubles() const {
   dsk.items_size_ = items_size_;
 
   dsk.num_levels_ = num_levels_;
-  dsk.levels_.resize(num_levels_); 
-  for (uint32_t i = 0; i < num_levels_; i++) {
+  dsk.levels_.resize(num_levels_ + 1);
+  for (int32_t i = 0; i < num_levels_ + 1; i++) {
     dsk.levels_[i] = levels_[i];
   }
 
-  
   return dsk;
 }
 

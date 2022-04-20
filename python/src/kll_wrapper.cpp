@@ -38,7 +38,7 @@ kll_sketch<T> kll_sketch_deserialize(py::bytes skBytes) {
   return kll_sketch<T>::deserialize(skStr.c_str(), skStr.length());
 }
 
-kll_sketch<double> kll_to_doubles(const kll_sketch<float>& sk) {
+kll_sketch<double> kll_float_to_doubles(const kll_sketch<float>& sk) {
   return sk.to_doubles();
 }
 
@@ -250,7 +250,7 @@ void bind_kll_sketch(py::module &m, const char* name) {
          "Constants were derived as the best fit to 99 percentile empirically measured max error in thousands of trials")
     .def("serialize", &dspy::kll_sketch_serialize<T>, "Serializes the sketch into a bytes object")
     .def_static("deserialize", &dspy::kll_sketch_deserialize<T>, "Deserializes the sketch from a bytes object")
-    .def_static("float_to_doubles", &dspy::kll_to_doubles, "Float to doubles")    
+    .def_static("float_to_doubles", &dspy::kll_float_to_doubles, "Float to doubles")    
     ;
 }
 
