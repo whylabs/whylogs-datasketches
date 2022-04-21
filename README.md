@@ -1,5 +1,6 @@
 # whylogs fork of Apache DataSketches Core C++ Library Component
 
+# This is not an Apache Sponsor Project
 Official repo: https://github.com/apache/datasketches-cpp
 
 This is a fork with some modified API to support whylogs use cases. It doesn't have any affiliation with the official Apache Datasketches project
