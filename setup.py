@@ -61,7 +61,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='whylogs-sketching',
-    version='3.4.0.dev8',
+    version='3.4.0.dev9',
     author='whylogs team',
     author_email='support@whylabs.ai',
     description='sketching library of whylogs',
