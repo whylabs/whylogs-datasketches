@@ -17,7 +17,7 @@
   
 import unittest
 import numpy as np
-from whylogs_datasketches import cpc_sketch, cpc_union
+from whylogs_sketching import cpc_sketch, cpc_union
 
 class CpcTest(unittest.TestCase):
   def test_cpc_example(self):

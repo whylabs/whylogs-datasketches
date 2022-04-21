@@ -17,7 +17,7 @@
  
 import unittest
 import numpy as np
-from whylogs_datasketches import frequent_strings_sketch, frequent_items_error_type
+from whylogs_sketching import frequent_strings_sketch, frequent_items_error_type
 
 class FiTest(unittest.TestCase):
   def test_fi_example(self):

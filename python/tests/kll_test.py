@@ -16,7 +16,7 @@
 # under the License.
 
 import unittest
-from whylogs_datasketches import kll_ints_sketch, kll_floats_sketch, kll_doubles_sketch
+from whylogs_sketching import kll_ints_sketch, kll_floats_sketch, kll_doubles_sketch
 import numpy as np
 
 class KllTest(unittest.TestCase):
