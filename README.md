@@ -1,4 +1,8 @@
-# Apache DataSketches Core C++ Library Component
+# whylogs fork of Apache DataSketches Core C++ Library Component
+
+Main repo: https://github.com/apache/datasketches-cpp
+
+
 This is the core C++ component of the Apache DataSketches library.  It contains all of the key sketching algorithms that are in the Java component and can be accessed directly from user applications. 
 
 This component is also a dependency of other components of the library that create adaptors for target systems, such as PostgreSQL.
