@@ -16,7 +16,7 @@
 # under the License.
 
 import unittest
-from whylogs_datasketches import req_ints_sketch, req_floats_sketch
+from whylogs_sketching import req_ints_sketch, req_floats_sketch
 import numpy as np
 
 class reqTest(unittest.TestCase):

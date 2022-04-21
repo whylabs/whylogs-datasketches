@@ -18,7 +18,7 @@
 import unittest
 import numpy as np
 
-from whylogs_datasketches import hll_sketch, hll_union, tgt_hll_type
+from whylogs_sketching import hll_sketch, hll_union, tgt_hll_type
 
 class HllTest(unittest.TestCase):
     def test_hll_example(self):
