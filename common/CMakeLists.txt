@@ -27,7 +27,7 @@ target_include_directories(common
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_compile_features(common INTERFACE cxx_std_11)
+target_compile_features(common INTERFACE cxx_std_17)
 
 install(TARGETS common EXPORT ${PROJECT_NAME})
 
