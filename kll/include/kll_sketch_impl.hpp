@@ -358,7 +358,11 @@ size_t kll_sketch<T, C, S, A>::get_serialized_size_bytes() const {
     return DATA_START_SINGLE_ITEM + sizeof(TT);
   }
   // the last integer in the levels_ array is not serialized because it can be derived
-  return DATA_START + num_levels_ * sizeof(uint32_t) + (get_num_retained() + 2) * sizeof(TT);
+  const size_t data_start = 
+    resolve_preamble_ints() == kll_constants::DEFAULT_PREAMBLE_DOUBLE ?
+    DATA_START_DOUBLE : DATA_START;
+
+  return data_start + num_levels_ * sizeof(uint32_t) + (get_num_retained() + 2) * sizeof(TT);
 }
 
 // implementation for all other types
@@ -384,7 +388,10 @@ size_t kll_sketch<T, C, S, A>::get_max_serialized_size_bytes(uint16_t k, uint64_
   const uint8_t num_levels = kll_helper::ub_on_num_levels(n);
   const uint32_t max_num_retained = kll_helper::compute_total_capacity(k, DEFAULT_M, num_levels);
   // the last integer in the levels_ array is not serialized because it can be derived
-  return DATA_START + num_levels * sizeof(uint32_t) + (max_num_retained + 2) * sizeof(TT);
+  const size_t data_start = 
+    resolve_preamble_ints() == kll_constants::DEFAULT_PREAMBLE_DOUBLE ?
+    DATA_START_DOUBLE : DATA_START;
+  return data_start + num_levels * sizeof(uint32_t) + (max_num_retained + 2) * sizeof(TT);
 }
 
 // implementation for all other types
@@ -415,6 +422,7 @@ void kll_sketch<T, C, S, A>::serialize(std::ostream& os) const {
   write(os, k_);
   write(os, m_);
   const uint8_t unused = 0;
+
   write(os, unused);
   if (is_empty()) return;
   if (!is_single_item) {
@@ -422,6 +430,12 @@ void kll_sketch<T, C, S, A>::serialize(std::ostream& os) const {
     write(os, min_k_);
     write(os, num_levels_);
     write(os, unused);
+    // Java KllDoublesSketch expects there to be 5 bytes here
+    if (preamble_ints ==  kll_constants::DEFAULT_PREAMBLE_DOUBLE) {
+      for(int i = 0; i < 4; ++i){
+        write(os, unused);
+      }
+    }
     write(os, levels_.data(), sizeof(levels_[0]) * num_levels_);
     S().serialize(os, min_value_, 1);
     S().serialize(os, max_value_, 1);
@@ -450,12 +464,17 @@ vector_u8<A> kll_sketch<T, C, S, A>::serialize(unsigned header_size_bytes) const
   ptr += copy_to_mem(flags_byte, ptr);
   ptr += copy_to_mem(k_, ptr);
   ptr += copy_to_mem(m_, ptr);
+
   ptr += sizeof(uint8_t); // unused
   if (!is_empty()) {
     if (!is_single_item) {
       ptr += copy_to_mem(n_, ptr);
       ptr += copy_to_mem(min_k_, ptr);
       ptr += copy_to_mem(num_levels_, ptr);
+      // Java KllDoublesSketch expects there to be 5 bytes here
+      if (preamble_ints == kll_constants::DEFAULT_PREAMBLE_DOUBLE) {
+        ptr += sizeof(uint8_t)*4;
+      }
       ptr += sizeof(uint8_t); // unused
       ptr += copy_to_mem(levels_.data(), ptr, sizeof(levels_[0]) * num_levels_);
       ptr += S().serialize(ptr, end_ptr - ptr, min_value_, 1);
@@ -477,6 +496,7 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(std::istream& is, con
   const auto flags_byte = read<uint8_t>(is);
   const auto k = read<uint16_t>(is);
   const auto m = read<uint8_t>(is);
+
   read<uint8_t>(is); // skip unused byte
 
   check_m(m);
@@ -500,6 +520,12 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(std::istream& is, con
     n = read<uint64_t>(is);
     min_k = read<uint16_t>(is);
     num_levels = read<uint8_t>(is);
+    // Java KllDoublesSketch expects there to be 5 bytes here
+    if (preamble_ints == kll_constants::DEFAULT_PREAMBLE_DOUBLE) {
+      for(int i = 0; i < 4; ++i){
+        read<uint8_t>(is); // skip unused byte
+      }
+    }
     read<uint8_t>(is); // skip unused byte
   }
   vector_u32<A> levels(num_levels + 1, 0, allocator);
@@ -586,6 +612,10 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(const void* bytes, si
     ptr += copy_from_mem(ptr, n);
     ptr += copy_from_mem(ptr, min_k);
     ptr += copy_from_mem(ptr, num_levels);
+    // Java KllDoublesSketch expects there to be 5 bytes here
+    if (preamble_ints == kll_constants::DEFAULT_PREAMBLE_DOUBLE) {
+      ptr += sizeof(uint8_t)*4;
+    }
     ptr += sizeof(uint8_t); // skip unused byte
   }
   vector_u32<A> levels(num_levels + 1, 0, allocator);

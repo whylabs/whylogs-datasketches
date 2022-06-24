@@ -524,9 +524,22 @@ class kll_sketch {
      *  2   ||---------------data----------------|-unused-|numLevels|-------min K-----------|
      */
 
+    /* Serialized double sketch layout, more than one item:
+     *  Adr:
+     *      ||    7    |   6   |    5   |    4   |    3   |    2    |    1   |      0       |
+     *  0   || unused  |   M   |--------K--------|  Flags |  FamID  | SerVer | PreambleInts |
+     *      ||   15    |   14  |   13   |   12   |   11   |   10    |    9   |      8       |
+     *  1   ||-----------------------------------N------------------------------------------|
+     *      ||   23    |   22  |   21   |   20   |   19   |    18   |   17   |      16      |
+     *  2   ||<-------------unused------------------------|numLevels|-------min K-----------|
+     *      ||                                                               |      24      |
+     *  3   ||<---------------------------------data----------------------------------------|
+     */
+
     static const size_t EMPTY_SIZE_BYTES = 8;
     static const size_t DATA_START_SINGLE_ITEM = 8;
     static const size_t DATA_START = 20;
+    static const size_t DATA_START_DOUBLE = 24;
 
     static const uint8_t SERIAL_VERSION_1 = 1;
     static const uint8_t SERIAL_VERSION_2 = 2;
