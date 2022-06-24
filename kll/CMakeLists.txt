@@ -30,7 +30,7 @@ target_include_directories(kll
 )
 
 target_link_libraries(kll INTERFACE common)
-target_compile_features(kll INTERFACE cxx_std_11)
+target_compile_features(kll INTERFACE cxx_std_17)
 
 install(TARGETS kll
   EXPORT ${PROJECT_NAME}

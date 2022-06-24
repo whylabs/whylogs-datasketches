@@ -51,6 +51,7 @@ public:
   }
   // call this constructor in tests and pass an allocator instance
   test_allocator(int) {}
+  test_allocator(int, int) {}
 
   test_allocator(const test_allocator&) {}
   template <class U>

@@ -152,11 +152,12 @@ void kll_sketch_update_num_list(kll_sketch<T>& sk, const py::list items) {
 namespace dspy = datasketches::python;
 
 template<typename T>
-void bind_kll_sketch(py::module &m, const char* name) {
+void bind_kll_sketch(py::module &m, const char* name, const uint16_t preamble) {
   using namespace datasketches;
 
-  py::class_<kll_sketch<T>>(m, name)
+  py::class_<kll_sketch<T>>(m, name, preamble)
     .def(py::init<uint16_t>(), py::arg("k")=kll_constants::DEFAULT_K)
+    .def(py::init<uint16_t>(), py::arg("preamble")=preamble)
     .def(py::init<const kll_sketch<T>&>())
     .def("update", (void (kll_sketch<T>::*)(const T&)) &kll_sketch<T>::update, py::arg("item"),
          "Updates the sketch with the given value")
@@ -255,7 +256,7 @@ void bind_kll_sketch(py::module &m, const char* name) {
 }
 
 void init_kll(py::module &m) {
-  bind_kll_sketch<int>(m, "kll_ints_sketch");
-  bind_kll_sketch<float>(m, "kll_floats_sketch");
-  bind_kll_sketch<double>(m, "kll_doubles_sketch");
+  bind_kll_sketch<int>(m, "kll_ints_sketch", kll_constants::DEFAULT_PREAMBLE_INT);
+  bind_kll_sketch<float>(m, "kll_floats_sketch", kll_constants::DEFAULT_PREAMBLE_FLOAT);
+  bind_kll_sketch<double>(m, "kll_doubles_sketch", kll_constants::DEFAULT_PREAMBLE_DOUBLE);
 }

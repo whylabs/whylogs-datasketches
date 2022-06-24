@@ -29,7 +29,7 @@ class CMakeBuild(build_ext):
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args =  ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir]
         cmake_args += ['-DWITH_PYTHON=True']
-        cmake_args += ['-DCMAKE_CXX_STANDARD=11']
+        cmake_args += ['-DCMAKE_CXX_STANDARD=17']
         # ensure we use a consistent python version
         cmake_args += ['-DPython3_EXECUTABLE=' + sys.executable]
         cfg = 'Debug' if self.debug else 'Release'
@@ -61,7 +61,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='whylogs-sketching',
-    version='3.4.0.dev9',
+    version='3.4.1.dev0',
     author='whylogs team',
     author_email='support@whylabs.ai',
     description='sketching library of whylogs',

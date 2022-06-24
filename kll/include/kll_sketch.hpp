@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 #include <cmath>
 
@@ -156,6 +157,9 @@ template<typename A> using vector_d = std::vector<double, AllocD<A>>;
 
 namespace kll_constants {
   const uint16_t DEFAULT_K = 200;
+  const uint16_t DEFAULT_PREAMBLE_FLOAT = 5;
+  const uint16_t DEFAULT_PREAMBLE_DOUBLE = 6;
+  const uint16_t DEFAULT_PREAMBLE_INT = 7;
 }
 
 template <
@@ -171,6 +175,7 @@ class kll_sketch {
 
     A allocator_;
     uint16_t k_;
+    std::optional<uint16_t> preamble_;
     uint8_t m_; // minimum buffer "width"
     uint16_t min_k_; // for error estimation after merging with different k
     uint64_t n_;
@@ -188,7 +193,7 @@ class kll_sketch {
     static const uint16_t MIN_K = DEFAULT_M;
     static const uint16_t MAX_K = (1 << 16) - 1;
 
-    explicit kll_sketch(uint16_t k = kll_constants::DEFAULT_K, const A& allocator = A());
+    explicit kll_sketch(uint16_t k = kll_constants::DEFAULT_K, std::optional<uint16_t> preamble = std::nullopt, const A& allocator = A());
     kll_sketch(const kll_sketch& other);
     kll_sketch(kll_sketch&& other) noexcept;
     ~kll_sketch();
@@ -220,6 +225,12 @@ class kll_sketch {
      * @return parameter k
      */
     uint16_t get_k() const;
+
+    /**
+     * Returns configured parameter preamble
+     * @return parameter preamble
+     */
+    uint16_t get_preamble() const;
 
     /**
      * Returns the length of the input stream.
@@ -531,7 +542,7 @@ class kll_sketch {
     // for deserialization
     class item_deleter;
     class items_deleter;
-    kll_sketch(uint16_t k, uint16_t min_k, uint64_t n, uint8_t num_levels, vector_u32<A>&& levels,
+    kll_sketch(uint16_t k, uint16_t preamble, uint16_t min_k, uint64_t n, uint8_t num_levels, vector_u32<A>&& levels,
         std::unique_ptr<T, items_deleter> items, uint32_t items_size, std::unique_ptr<T, item_deleter> min_value,
         std::unique_ptr<T, item_deleter> max_value, bool is_level_zero_sorted);
 
@@ -569,6 +580,8 @@ class kll_sketch {
     static void check_preamble_ints(uint8_t preamble_ints, uint8_t flags_byte);
     static void check_serial_version(uint8_t serial_version);
     static void check_family_id(uint8_t family_id);
+    static uint8_t resolve_preamble_ints();
+
 
     // implementations for floating point types
     template<typename TT = T, typename std::enable_if<std::is_floating_point<TT>::value, int>::type = 0>

@@ -22,8 +22,10 @@
 
 #include <iostream>
 #include <iomanip>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
 
 #include "conditional_forward.hpp"
 #include "memory_operations.hpp"
@@ -32,9 +34,10 @@
 namespace datasketches {
 
 template<typename T, typename C, typename S, typename A>
-kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, const A& allocator):
+kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, std::optional<uint16_t> preamble, const A& allocator):
 allocator_(allocator),
 k_(k),
+preamble_(preamble),
 m_(DEFAULT_M),
 min_k_(k),
 n_(0),
@@ -57,6 +60,7 @@ template<typename T, typename C, typename S, typename A>
 kll_sketch<T, C, S, A>::kll_sketch(const kll_sketch& other):
 allocator_(other.allocator_),
 k_(other.k_),
+preamble_(other.preamble_),
 m_(other.m_),
 min_k_(other.min_k_),
 n_(other.n_),
@@ -78,6 +82,7 @@ template<typename T, typename C, typename S, typename A>
 kll_sketch<T, C, S, A>::kll_sketch(kll_sketch&& other) noexcept:
 allocator_(std::move(other.allocator_)),
 k_(other.k_),
+preamble_(other.preamble_),
 m_(other.m_),
 min_k_(other.min_k_),
 n_(other.n_),
@@ -99,6 +104,7 @@ kll_sketch<T, C, S, A>& kll_sketch<T, C, S, A>::operator=(const kll_sketch& othe
   kll_sketch<T, C, S, A> copy(other);
   std::swap(allocator_, copy.allocator_);
   std::swap(k_, copy.k_);
+  std::swap(preamble_, copy.preamble_);
   std::swap(m_, copy.m_);
   std::swap(min_k_, copy.min_k_);
   std::swap(n_, copy.n_);
@@ -116,6 +122,7 @@ template<typename T, typename C, typename S, typename A>
 kll_sketch<T, C, S, A>& kll_sketch<T, C, S, A>::operator=(kll_sketch&& other) {
   std::swap(allocator_, other.allocator_);
   std::swap(k_, other.k_);
+  std::swap(preamble_, other.preamble_);
   std::swap(m_, other.m_);
   std::swap(min_k_, other.min_k_);
   std::swap(n_, other.n_);
@@ -182,6 +189,9 @@ void kll_sketch<T, C, S, A>::merge(FwdSk&& other) {
   if (m_ != other.m_) {
     throw std::invalid_argument("incompatible M: " + std::to_string(m_) + " and " + std::to_string(other.m_));
   }
+   if (get_preamble() != other.get_preamble()) {
+    throw std::invalid_argument("incompatible preambles: " + std::to_string(get_preamble()) + " and " + std::to_string(other.get_preamble()));
+  }
   if (is_empty()) {
     min_value_ = new (allocator_.allocate(1)) T(conditional_forward<FwdSk>(*other.min_value_));
     max_value_ = new (allocator_.allocate(1)) T(conditional_forward<FwdSk>(*other.max_value_));
@@ -208,6 +218,14 @@ bool kll_sketch<T, C, S, A>::is_empty() const {
 template<typename T, typename C, typename S, typename A>
 uint16_t kll_sketch<T, C, S, A>::get_k() const {
   return k_;
+}
+
+template<typename T, typename C, typename S, typename A>
+uint16_t kll_sketch<T, C, S, A>::get_preamble() const {
+  if (preamble_) {
+    return *preamble_;
+  }
+  return resolve_preamble_ints();
 }
 
 template<typename T, typename C, typename S, typename A>
@@ -383,7 +401,7 @@ size_t kll_sketch<T, C, S, A>::get_max_serialized_size_bytes(uint16_t k, uint64_
 template<typename T, typename C, typename S, typename A>
 void kll_sketch<T, C, S, A>::serialize(std::ostream& os) const {
   const bool is_single_item = n_ == 1;
-  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : PREAMBLE_INTS_FULL);
+  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : get_preamble());
   write(os, preamble_ints);
   const uint8_t serial_version(is_single_item ? SERIAL_VERSION_2 : SERIAL_VERSION_1);
   write(os, serial_version);
@@ -419,7 +437,7 @@ vector_u8<A> kll_sketch<T, C, S, A>::serialize(unsigned header_size_bytes) const
   vector_u8<A> bytes(size, 0, allocator_);
   uint8_t* ptr = bytes.data() + header_size_bytes;
   const uint8_t* end_ptr = ptr + size;
-  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : PREAMBLE_INTS_FULL);
+  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : get_preamble());
   ptr += copy_to_mem(preamble_ints, ptr);
   const uint8_t serial_version(is_single_item ? SERIAL_VERSION_2 : SERIAL_VERSION_1);
   ptr += copy_to_mem(serial_version, ptr);
@@ -469,7 +487,7 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(std::istream& is, con
 
   if (!is.good()) throw std::runtime_error("error reading from std::istream");
   const bool is_empty(flags_byte & (1 << flags::IS_EMPTY));
-  if (is_empty) return kll_sketch(k, allocator);
+  if (is_empty) return kll_sketch(k, preamble_ints, allocator);
 
   uint64_t n;
   uint16_t min_k;
@@ -525,7 +543,7 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(std::istream& is, con
   }
   if (!is.good())
     throw std::runtime_error("error reading from std::istream");
-  return kll_sketch(k, min_k, n, num_levels, std::move(levels), std::move(items), capacity,
+  return kll_sketch(k, preamble_ints, min_k, n, num_levels, std::move(levels), std::move(items), capacity,
       std::move(min_value), std::move(max_value), is_level_zero_sorted);
 }
 
@@ -554,7 +572,7 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(const void* bytes, si
   ensure_minimum_memory(size, preamble_ints * sizeof(uint32_t));
 
   const bool is_empty(flags_byte & (1 << flags::IS_EMPTY));
-  if (is_empty) return kll_sketch<T, C, S, A>(k, allocator);
+  if (is_empty) return kll_sketch<T, C, S, A>(k, preamble_ints, allocator);
 
   uint64_t n;
   uint16_t min_k;
@@ -611,7 +629,7 @@ kll_sketch<T, C, S, A> kll_sketch<T, C, S, A>::deserialize(const void* bytes, si
     // copy did not throw, repackage with destrtuctor
     max_value = std::unique_ptr<T, item_deleter>(max_value_buffer.release(), item_deleter(allocator));
   }
-  return kll_sketch(k, min_k, n, num_levels, std::move(levels), std::move(items), capacity,
+  return kll_sketch(k, preamble_ints, min_k, n, num_levels, std::move(levels), std::move(items), capacity,
       std::move(min_value), std::move(max_value), is_level_zero_sorted);
 }
 
@@ -631,11 +649,12 @@ double kll_sketch<T, C, S, A>::get_normalized_rank_error(uint16_t k, bool pmf) {
 
 // for deserialization
 template<typename T, typename C, typename S, typename A>
-kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, uint16_t min_k, uint64_t n, uint8_t num_levels, vector_u32<A>&& levels,
+kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, uint16_t preamble, uint16_t min_k, uint64_t n, uint8_t num_levels, vector_u32<A>&& levels,
     std::unique_ptr<T, items_deleter> items, uint32_t items_size, std::unique_ptr<T, item_deleter> min_value,
     std::unique_ptr<T, item_deleter> max_value, bool is_level_zero_sorted):
 allocator_(levels.get_allocator()),
 k_(k),
+preamble_(preamble),
 m_(DEFAULT_M),
 min_k_(min_k),
 n_(n),
@@ -948,6 +967,18 @@ void kll_sketch<T, C, S, A>::check_m(uint8_t m) {
 }
 
 template<typename T, typename C, typename S, typename A>
+uint8_t kll_sketch<T, C, S, A>::resolve_preamble_ints() {
+  uint8_t expected_preamble_ints = kll_constants::DEFAULT_PREAMBLE_FLOAT;
+  if constexpr(std::is_same_v<T, double>) {
+      expected_preamble_ints = kll_constants::DEFAULT_PREAMBLE_DOUBLE;
+  }
+  if constexpr(std::is_same_v<T, int>) {
+    expected_preamble_ints = kll_constants::DEFAULT_PREAMBLE_INT;
+  }
+  return expected_preamble_ints;
+}
+
+template<typename T, typename C, typename S, typename A>
 void kll_sketch<T, C, S, A>::check_preamble_ints(uint8_t preamble_ints, uint8_t flags_byte) {
   const bool is_empty(flags_byte & (1 << flags::IS_EMPTY));
   const bool is_single_item(flags_byte & (1 << flags::IS_SINGLE_ITEM));
@@ -957,9 +988,11 @@ void kll_sketch<T, C, S, A>::check_preamble_ints(uint8_t preamble_ints, uint8_t 
           + std::to_string(PREAMBLE_INTS_SHORT) + " for an empty or single item sketch: " + std::to_string(preamble_ints));
     }
   } else {
-    if (preamble_ints != PREAMBLE_INTS_FULL) {
-      throw std::invalid_argument("Possible corruption: preamble ints must be "
-          + std::to_string(PREAMBLE_INTS_FULL) + " for a sketch with more than one item: " + std::to_string(preamble_ints));
+    uint8_t expected_preamble_ints = resolve_preamble_ints();
+
+    if (preamble_ints != expected_preamble_ints) {
+      throw std::invalid_argument("Possible corruption: preamble ints for type expected to be "
+          + std::to_string(expected_preamble_ints) + " for a sketch with more than one item but got: " + std::to_string(preamble_ints));
     }
   }
 }
@@ -988,6 +1021,7 @@ string<A> kll_sketch<T, C, S, A>::to_string(bool print_levels, bool print_items)
   std::ostringstream os;
   os << "### KLL sketch summary:" << std::endl;
   os << "   K              : " << k_ << std::endl;
+  os << "   PREAMBLE       : " << get_preamble() << std::endl;
   os << "   min K          : " << min_k_ << std::endl;
   os << "   M              : " << (unsigned int) m_ << std::endl;
   os << "   N              : " << n_ << std::endl;
@@ -1036,7 +1070,7 @@ string<A> kll_sketch<T, C, S, A>::to_string(bool print_levels, bool print_items)
 
 template <typename T, typename C, typename S, typename A>
 kll_sketch<double> kll_sketch<T, C, S, A>::to_doubles() const {
-  auto dsk = kll_sketch<double>(k_);
+  auto dsk = kll_sketch<double>(k_, kll_constants::DEFAULT_PREAMBLE_DOUBLE);
   if (is_empty()) {
     return dsk;
   }
