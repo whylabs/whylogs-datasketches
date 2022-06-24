@@ -30,7 +30,7 @@ target_include_directories(fi
 )
 
 target_link_libraries(fi INTERFACE common)
-target_compile_features(fi INTERFACE cxx_std_11)
+target_compile_features(fi INTERFACE cxx_std_17)
 
 install(TARGETS fi
   EXPORT ${PROJECT_NAME}
