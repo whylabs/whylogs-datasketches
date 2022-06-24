@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <iomanip>
-#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
@@ -34,7 +33,7 @@
 namespace datasketches {
 
 template<typename T, typename C, typename S, typename A>
-kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, std::optional<uint16_t> preamble, const A& allocator):
+kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, uint16_t preamble, const A& allocator):
 allocator_(allocator),
 k_(k),
 preamble_(preamble),
@@ -222,8 +221,8 @@ uint16_t kll_sketch<T, C, S, A>::get_k() const {
 
 template<typename T, typename C, typename S, typename A>
 uint16_t kll_sketch<T, C, S, A>::get_preamble() const {
-  if (preamble_) {
-    return *preamble_;
+  if (preamble_ != kll_constants::DEFAULT_PREAMBLE) {
+    return preamble_;
   }
   return resolve_preamble_ints();
 }
@@ -1070,7 +1069,7 @@ string<A> kll_sketch<T, C, S, A>::to_string(bool print_levels, bool print_items)
 
 template <typename T, typename C, typename S, typename A>
 kll_sketch<double> kll_sketch<T, C, S, A>::to_doubles() const {
-  auto dsk = kll_sketch<double>(k_, kll_constants::DEFAULT_PREAMBLE_DOUBLE);
+  auto dsk = kll_sketch<double>(k_);
   if (is_empty()) {
     return dsk;
   }

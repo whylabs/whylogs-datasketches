@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: whylogs-sketching
+Version: 3.4.1.dev0
+Summary: sketching library of whylogs
+Home-page: https://github.com/whylabs/whylogs-sketching
+Author: whylogs team
+Author-email: support@whylabs.ai
+License: Apache License 2.0
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+
+# whylogs-sketching
+
+This is a fork of the [Apache DataSketches](https://datasketches.apache.org) Python library.
+

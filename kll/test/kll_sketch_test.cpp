@@ -125,13 +125,13 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
   }
 
   SECTION("many items, exact mode") {
-    kll_float_sketch sketch(200, 5, 0);
+    kll_float_sketch sketch(200, 0, 0);
     const uint32_t n = 200;
     for (uint32_t i = 0; i < n; i++) {
       sketch.update(static_cast<float>(i));
       REQUIRE(sketch.get_n() == i + 1);
     }
-    REQUIRE(sketch.get_preamble() == 5);
+    REQUIRE(sketch.get_preamble() ==  kll_constants::DEFAULT_PREAMBLE_FLOAT);
     REQUIRE_FALSE(sketch.is_empty());
     REQUIRE_FALSE(sketch.is_estimation_mode());
     REQUIRE(sketch.get_num_retained() == n);
@@ -163,7 +163,7 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
   }
 
   SECTION("10 items") {
-    kll_float_sketch sketch(200, 5, 0);
+    kll_float_sketch sketch(200, 0, 0);
     sketch.update(1.0f);
     sketch.update(2.0f);
     sketch.update(3.0f);
@@ -178,6 +178,25 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
     REQUIRE(sketch.get_quantile(0.5) == 6.0);
     REQUIRE(sketch.get_quantile(0.99) == 10.0);
     REQUIRE(sketch.get_quantile(1) == 10.0);
+  }
+
+   SECTION("10 double items") {
+    kll_double_sketch sketch(200, 0, 0);
+    sketch.update(1.0);
+    sketch.update(2.0);
+    sketch.update(3.0);
+    sketch.update(4.0);
+    sketch.update(5.0);
+    sketch.update(6.0);
+    sketch.update(7.0);
+    sketch.update(8.0);
+    sketch.update(9.0);
+    sketch.update(10.0);
+    REQUIRE(sketch.get_quantile(0) == 1.0);
+    REQUIRE(sketch.get_quantile(0.5) == 6.0);
+    REQUIRE(sketch.get_quantile(0.99) == 10.0);
+    REQUIRE(sketch.get_quantile(1) == 10.0);
+    REQUIRE(sketch.get_preamble() == kll_constants::DEFAULT_PREAMBLE_DOUBLE);
   }
 
   SECTION("100 items") {
@@ -542,8 +561,8 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
   }
 
   SECTION("merge") {
-    kll_float_sketch sketch1(200, 5, 0);
-    kll_float_sketch sketch2(200, 5, 0);
+    kll_float_sketch sketch1(200, 0, 0);
+    kll_float_sketch sketch2(200, 0, 0);
     const int n = 10000;
     for (int i = 0; i < n; i++) {
       sketch1.update(static_cast<float>(i));

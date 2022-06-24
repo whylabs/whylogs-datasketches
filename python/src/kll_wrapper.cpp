@@ -152,12 +152,12 @@ void kll_sketch_update_num_list(kll_sketch<T>& sk, const py::list items) {
 namespace dspy = datasketches::python;
 
 template<typename T>
-void bind_kll_sketch(py::module &m, const char* name, const uint16_t preamble) {
+void bind_kll_sketch(py::module &m, const char* name) { //, const uint16_t preamble) {
   using namespace datasketches;
 
-  py::class_<kll_sketch<T>>(m, name, preamble)
-    .def(py::init<uint16_t>(), py::arg("k")=kll_constants::DEFAULT_K)
-    .def(py::init<uint16_t>(), py::arg("preamble")=preamble)
+  py::class_<kll_sketch<T>>(m, name)
+    .def(py::init<uint16_t, uint16_t>(), py::arg("k")=kll_constants::DEFAULT_K,
+      py::arg("preamble")=kll_constants::DEFAULT_PREAMBLE)
     .def(py::init<const kll_sketch<T>&>())
     .def("update", (void (kll_sketch<T>::*)(const T&)) &kll_sketch<T>::update, py::arg("item"),
          "Updates the sketch with the given value")
@@ -175,6 +175,8 @@ void bind_kll_sketch(py::module &m, const char* name, const uint16_t preamble) {
          "Returns True if the sketch is empty, otherwise False")
     .def("get_k", &kll_sketch<T>::get_k,
          "Returns the configured parameter k")
+    .def("get_preamble", &kll_sketch<T>::get_preamble,
+         "Returns the configured parameter preamble")
     .def("get_n", &kll_sketch<T>::get_n,
          "Returns the length of the input stream")
     .def("get_num_retained", &kll_sketch<T>::get_num_retained,
@@ -256,7 +258,7 @@ void bind_kll_sketch(py::module &m, const char* name, const uint16_t preamble) {
 }
 
 void init_kll(py::module &m) {
-  bind_kll_sketch<int>(m, "kll_ints_sketch", kll_constants::DEFAULT_PREAMBLE_INT);
-  bind_kll_sketch<float>(m, "kll_floats_sketch", kll_constants::DEFAULT_PREAMBLE_FLOAT);
-  bind_kll_sketch<double>(m, "kll_doubles_sketch", kll_constants::DEFAULT_PREAMBLE_DOUBLE);
+  bind_kll_sketch<int>(m, "kll_ints_sketch");
+  bind_kll_sketch<float>(m, "kll_floats_sketch");
+  bind_kll_sketch<double>(m, "kll_doubles_sketch");
 }

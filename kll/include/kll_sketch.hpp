@@ -22,7 +22,6 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 #include <vector>
 #include <cmath>
 
@@ -157,6 +156,7 @@ template<typename A> using vector_d = std::vector<double, AllocD<A>>;
 
 namespace kll_constants {
   const uint16_t DEFAULT_K = 200;
+  const uint16_t DEFAULT_PREAMBLE = 0;
   const uint16_t DEFAULT_PREAMBLE_FLOAT = 5;
   const uint16_t DEFAULT_PREAMBLE_DOUBLE = 6;
   const uint16_t DEFAULT_PREAMBLE_INT = 7;
@@ -175,7 +175,7 @@ class kll_sketch {
 
     A allocator_;
     uint16_t k_;
-    std::optional<uint16_t> preamble_;
+    uint16_t preamble_;
     uint8_t m_; // minimum buffer "width"
     uint16_t min_k_; // for error estimation after merging with different k
     uint64_t n_;
@@ -193,7 +193,7 @@ class kll_sketch {
     static const uint16_t MIN_K = DEFAULT_M;
     static const uint16_t MAX_K = (1 << 16) - 1;
 
-    explicit kll_sketch(uint16_t k = kll_constants::DEFAULT_K, std::optional<uint16_t> preamble = std::nullopt, const A& allocator = A());
+    explicit kll_sketch(uint16_t k = kll_constants::DEFAULT_K, uint16_t preamble = 0, const A& allocator = A());
     kll_sketch(const kll_sketch& other);
     kll_sketch(kll_sketch&& other) noexcept;
     ~kll_sketch();
