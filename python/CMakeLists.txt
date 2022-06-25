@@ -16,11 +16,13 @@
 # under the License.
 
 cmake_minimum_required(VERSION 3.12.0)
-find_package(Python3 COMPONENTS Interpreter Development)
-message("Python3_EXECUTABLE:${Python3_EXECUTABLE}")
-message("Python_EXECUTABLE:${Python_EXECUTABLE}")
 
-set(Python_EXECUTABLE ${Python3_EXECUTABLE})
+message("setting Python3 based on sys.executable")
+set(Python3 ${Python3_EXECUTABLE})
+message("Python3:${Python3}")
+find_package(Python3 COMPONENTS Interpreter Development)
+
+message("Python3_EXECUTABLE:${Python3_EXECUTABLE}")
 message("Python_EXECUTABLE:${Python_EXECUTABLE}")
 
 
