@@ -35,7 +35,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_MACOSX_RPATH ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # enable compiler warnings globally
 # derived from https://foonathan.net/blog/2018/10/17/cmake-warnings.html
@@ -95,7 +95,7 @@ endif()
 # do we need the next line since we don't actually make a library anymore?
 add_library(datasketches INTERFACE)
 
-target_compile_features(datasketches INTERFACE cxx_std_11)
+target_compile_features(datasketches INTERFACE cxx_std_17)
 
 add_subdirectory(common)
 add_subdirectory(hll)

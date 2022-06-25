@@ -30,7 +30,7 @@ target_include_directories(hll
 )
 
 target_link_libraries(hll INTERFACE common)
-target_compile_features(hll INTERFACE cxx_std_11)
+target_compile_features(hll INTERFACE cxx_std_17)
 
 install(TARGETS hll
   EXPORT ${PROJECT_NAME}

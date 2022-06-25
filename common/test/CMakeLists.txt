@@ -22,7 +22,7 @@
 add_library(common_test OBJECT "")
 
 set_target_properties(common_test PROPERTIES
-  CXX_STANDARD 11
+  CXX_STANDARD 17
   CXX_STANDARD_REQUIRED YES
 )
 
@@ -47,7 +47,7 @@ add_executable(integration_test)
 target_link_libraries(integration_test cpc fi hll kll req sampling theta tuple common_test)
 
 set_target_properties(integration_test PROPERTIES
-  CXX_STANDARD 11
+  CXX_STANDARD 17
   CXX_STANDARD_REQUIRED YES
 )
 

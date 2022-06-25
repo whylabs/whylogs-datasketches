@@ -59,6 +59,7 @@ class KllTest(unittest.TestCase):
       self.assertEqual(kll.get_n(), n)
       self.assertEqual(kll.get_k(), k)
       self.assertLess(kll.get_num_retained(), n)
+      self.assertEqual(kll.get_preamble(), 5)
 
       # merging itself will double the number of items the sketch has seen
       kll.merge(kll)
@@ -86,6 +87,8 @@ class KllTest(unittest.TestCase):
         self.assertFalse(kll.is_empty())
         self.assertFalse(kll.is_estimation_mode()) # n < k
         self.assertEqual(kll.get_k(), k)
+        self.assertEqual(kll.get_preamble(), 7) # using 7 for ints
+
 
         pmf = kll.get_pmf([round(n/2)])
         self.assertIsNotNone(pmf)
@@ -121,13 +124,25 @@ class KllTest(unittest.TestCase):
       kll = kll_doubles_sketch(k)
       self.assertTrue(kll.is_empty())
 
+    def test_kll_doubles_override_preamble(self):
+      # already tested floats and it's templatized, so just make sure it instantiates properly
+      k = 75
+      kll = kll_doubles_sketch(k, 5) # doubles will get preamble of 6, but override here to 5
+      kll.update(3.4)
+      kll.update(5.6)
+      self.assertFalse(kll.is_empty())
+      self.assertEqual(kll.get_preamble(), 5)
+
     def test_kll_floats_to_doubles(self):
       # test if we can convert between floats and doubles
       k = 75
       kll = kll_floats_sketch(k)
       kll.update_list(list(range(0, 1000)))
+      self.assertEqual(kll.get_preamble(), 5) # float preamble 5
 
       dkll = kll_floats_sketch.float_to_doubles(kll)
+
+      self.assertEqual(dkll.get_preamble(), 6) # should update to double preamble 6
       self.assertFalse(dkll.is_empty())
 
 if __name__ == '__main__':
