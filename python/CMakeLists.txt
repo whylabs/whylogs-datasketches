@@ -17,17 +17,11 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 find_package(Python3 COMPONENTS Interpreter Development)
-message("Python_FOUND:${Python_FOUND}")
-message("Python_VERSION:${Python_VERSION}")
-message("Python_Development_FOUND:${Python_Development_FOUND}")
-message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python3_EXECUTABLE:${Python3_EXECUTABLE}")
-message("Python3:${Python3}")
-message("PythonInterp:${PythonInterp}")
-message("Python3_INCLUDE_DIRS:${Python3_INCLUDE_DIRS}")
-message("Python3_LIBRARIES:${Python3_LIBRARIES}")
-message("python:${python}")
+message("Python_EXECUTABLE:${Python_EXECUTABLE}")
 
+set(Python_EXECUTABLE ${Python3_EXECUTABLE})
+message("Python_EXECUTABLE:${Python_EXECUTABLE}")
 
 
 # only Windows+MSVC seems to have trouble locating pybind11
