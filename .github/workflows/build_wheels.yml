@@ -66,9 +66,8 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir dist
         env:
-          CIBW_BEFORE_BUILD: echo "python version:" && python --version
+          CIBW_BEFORE_BUILD: python --version
           CIBW_BUILD_FRONTEND: "build"
-          CIBW_BEFORE_BUILD: python -m pip install cmake>=3.18
           CIBW_SKIP: "*-win32"
           CIBW_BUILD: "cp38-*manylinux*64"
           CIBW_ARCHS_MACOS: "x86_64 universal2"
