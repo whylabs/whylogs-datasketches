@@ -27,7 +27,7 @@ jobs:
           python-version: '3.8'
 
       - name: Install Python dependencies
-        run: python -m pip install --upgrade pip setuptools wheel numpy tox pytest build
+        run: python -m pip install cibuildwheel==2.7.0
 
       - name: Build sdist
         run: python setup.py sdist
@@ -73,11 +73,12 @@ jobs:
           python-version: '3.8'
            
       - name: Install Python dependencies
-        run: python -m pip install --upgrade pip setuptools wheel numpy tox pytest build cibuildwheel==2.7.0 twine
+        run: python -m pip install cibuildwheel==2.7.0
         
       - name: Build wheels
         run: python -m cibuildwheel --output-dir dist
         env:
+          CIBW_BEFORE_BUILD: python -m pip install cmake>=3.18
           CIBW_SKIP: "*-win32"
           CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
