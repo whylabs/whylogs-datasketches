@@ -44,22 +44,10 @@ jobs:
       matrix:
         config:
         - {
-            name: "MacOS Latest, Clang",
-            os: macos-latest,
-            cc: "clang", cxx: "clang++"
-          }
-        - {
             name: "Ubuntu Latest, GCC",
             os: ubuntu-latest,
             cc: "gcc", cxx: "g++"
           }
-        - {
-            name: "Windows Latest, MSVC",
-            os: windows-latest,
-            cc: "cl", cxx: "cl",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-            
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -78,9 +66,10 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir dist
         env:
+          CIBW_BUILD_FRONTEND: "build"
           CIBW_BEFORE_BUILD: python -m pip install cmake>=3.18
           CIBW_SKIP: "*-win32"
-          CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64"
+          CIBW_BUILD: "cp38-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
 
