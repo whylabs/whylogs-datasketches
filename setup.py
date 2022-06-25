@@ -32,12 +32,12 @@ class CMakeBuild(build_ext):
         cmake_args += ['-DCMAKE_CXX_STANDARD=17']
         # ensure we use a consistent python version
         python_executable = '' + sys.executable
-        python_path = python_executable[:len(python_executable) - 6]
+        python_root_dir = python_executable[:len(python_executable) - 6]
         cmake_args += ['-DPython3_EXECUTABLE=' + python_executable]
         cmake_args += ['-DPython_EXECUTABLE=' + python_executable]
-        cmake_args += ['-DPython3_INCLUDE_DIRS=' + python_path]
-        cmake_args += ['-DPython_INCLUDE_DIRS=' + python_path]
-        
+        cmake_args += ['-DPYTHON_EXECUTABLE:FILEPATH=' + python_executable]
+        cmake_args += ['-DPython3_ROOT_DIR=' + python_root_dir]
+
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
