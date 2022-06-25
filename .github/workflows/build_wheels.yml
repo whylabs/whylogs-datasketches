@@ -66,12 +66,13 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir dist
         env:
+          CIBW_BEFORE_BUILD: echo "python version:" && python --version
           CIBW_BUILD_FRONTEND: "build"
           CIBW_BEFORE_BUILD: python -m pip install cmake>=3.18
           CIBW_SKIP: "*-win32"
-          CIBW_BUILD: "cp38-*64"
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_BUILD: "cp38-*manylinux*64"
           CIBW_ARCHS_MACOS: "x86_64 universal2"
+          CIBW_TEST_COMMAND: 'python -m pytest {package}/python/tests'
 
       - uses: actions/upload-artifact@v2
         with:
