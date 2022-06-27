@@ -2,7 +2,6 @@
 requires = ["wheel",
             "setuptools >= 30.3.0",
             "cmake >= 3.12",
-            "pip >= 10.0",
             "pybind11[global] >= 2.6.0"]
 build-backend = "setuptools.build_meta"
 
@@ -14,6 +13,7 @@ envlist = py3
 [testenv]
 deps = pytest
        numpy
+       pybind11
 changedir = python/tests
 commands = pytest
 """
