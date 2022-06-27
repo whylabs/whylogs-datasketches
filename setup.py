@@ -32,6 +32,11 @@ class CMakeBuild(build_ext):
         cmake_args += ['-DCMAKE_CXX_STANDARD=17']
         # ensure we use a consistent python version
         cmake_args += ['-DPython3_EXECUTABLE=' + sys.executable]
+
+        # only set this variable in POSIX systems to ensure the right Python path.
+        # this method doesn't work for Windows (unclear reason)
+        if os.name == 'posix':
+            cmake_args += ['-DPYTHON_EXECUTABLE=' + sys.executable]
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
