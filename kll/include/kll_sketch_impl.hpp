@@ -188,8 +188,11 @@ void kll_sketch<T, C, S, A>::merge(FwdSk&& other) {
   if (m_ != other.m_) {
     throw std::invalid_argument("incompatible M: " + std::to_string(m_) + " and " + std::to_string(other.m_));
   }
-   if (get_preamble() != other.get_preamble()) {
-    throw std::invalid_argument("incompatible preambles: " + std::to_string(get_preamble()) + " and " + std::to_string(other.get_preamble()));
+  if (get_preamble() != other.get_preamble() 
+      && get_preamble() != PREAMBLE_INTS_SHORT 
+      && other.get_preamble() != PREAMBLE_INTS_SHORT) {
+      throw std::invalid_argument("incompatible preambles: " + std::to_string(get_preamble())
+                                  + " and " + std::to_string(other.get_preamble()));
   }
   if (is_empty()) {
     min_value_ = new (allocator_.allocate(1)) T(conditional_forward<FwdSk>(*other.min_value_));
@@ -224,7 +227,8 @@ uint16_t kll_sketch<T, C, S, A>::get_preamble() const {
   if (preamble_ != kll_constants::DEFAULT_PREAMBLE) {
     return preamble_;
   }
-  return resolve_preamble_ints();
+  const bool is_single_item = n_ == 1;
+  return is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : resolve_preamble_ints();
 }
 
 template<typename T, typename C, typename S, typename A>

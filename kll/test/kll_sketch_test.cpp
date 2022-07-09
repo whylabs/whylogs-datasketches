@@ -696,6 +696,53 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
     REQUIRE(sketch2.get_max_value() == 999999.0f);
   }
 
+  SECTION("merge float single many") {
+    kll_float_sketch sketch1(200, 0, 0);
+    for (int i = 0; i < 10; i++) sketch1.update(static_cast<float>(i));
+    kll_float_sketch single_merge(200, 0, 0);
+    kll_float_sketch single2(200, 0, 0);
+    single_merge.update(5);
+    single2.update(5);
+    REQUIRE(single_merge.get_preamble() == 2);
+    single_merge.merge(sketch1);
+    REQUIRE(single_merge.get_preamble() == 5);
+    REQUIRE(single2.get_preamble() == 2);
+
+    REQUIRE(sketch1.get_preamble() == 5);
+    sketch1.merge(single2);
+    REQUIRE(sketch1.get_preamble() == 5);
+
+    REQUIRE(sketch1.get_min_value() == 0.0f);
+    REQUIRE(sketch1.get_max_value() == 9.0f);
+    REQUIRE(single_merge.get_min_value() == sketch1.get_min_value());
+    REQUIRE(single_merge.get_max_value() == sketch1.get_max_value());
+  }
+
+  SECTION("merge double override preamble") {
+    kll_double_sketch sketch1(200, 5, 0);
+    for (int i = 0; i < 10; i++) sketch1.update(static_cast<float>(i));
+    kll_double_sketch sketch2(200, 0, 0);
+    sketch2.update(5);
+    REQUIRE(sketch2.get_preamble() == 2);
+    REQUIRE(sketch1.get_preamble() == 5);
+    sketch2.update(4);
+    REQUIRE(sketch2.get_preamble() == 6);
+    REQUIRE_THROWS_AS(sketch1.merge(sketch2), std::invalid_argument);
+  }
+
+  SECTION("merge double empty many") {
+    kll_double_sketch sketch1(200, 6, 0);
+    for (int i = 0; i < 10; i++) sketch1.update(static_cast<float>(i));
+    kll_double_sketch empty_merge(200, 6, 0);
+    kll_double_sketch empty2(200, 6, 0);
+    empty_merge.merge(sketch1);
+    sketch1.merge(empty2);
+    REQUIRE(sketch1.get_min_value() == 0.0f);
+    REQUIRE(sketch1.get_max_value() == 9.0f);
+    REQUIRE(empty_merge.get_min_value() == 0.0f);
+    REQUIRE(empty_merge.get_max_value() == 9.0f);
+  }
+
   SECTION("sketch of ints") {
     kll_sketch<int> sketch;
     REQUIRE_THROWS_AS(sketch.get_quantile(0), std::runtime_error);
