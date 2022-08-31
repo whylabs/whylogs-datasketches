@@ -132,11 +132,13 @@ void kll_sketch_update(kll_sketch<T>& sk, py::array_t<T, py::array::c_style | py
     throw std::invalid_argument("input data must have only one dimension. Found: "
           + std::to_string(items.ndim()));
   }
-  
+
   auto data = items.template unchecked<1>();
+
   for (uint32_t i = 0; i < data.size(); ++i) {
     sk.update(data(i));
   }
+
 }
 
 template<typename T>
@@ -253,7 +255,7 @@ void bind_kll_sketch(py::module &m, const char* name) { //, const uint16_t pream
          "Constants were derived as the best fit to 99 percentile empirically measured max error in thousands of trials")
     .def("serialize", &dspy::kll_sketch_serialize<T>, "Serializes the sketch into a bytes object")
     .def_static("deserialize", &dspy::kll_sketch_deserialize<T>, "Deserializes the sketch from a bytes object")
-    .def_static("float_to_doubles", &dspy::kll_float_to_doubles, "Float to doubles")    
+    .def_static("float_to_doubles", &dspy::kll_float_to_doubles, "Float to doubles")
     ;
 }
 

@@ -55,6 +55,11 @@ DEB, STGZ, TGZ, TZ, ZIP, etc.
     $ cmake3 --build build/Release -t package
 ```
 
+To generate python the wheels locally, after building the c++ parts of the project described above you can run standard python commands to setup the wheel file e.g.:
+```
+python setup.py bdist_wheel 
+```
+
 The DataSketches project can be included in other projects' CMakeLists.txt files in one of two ways.
 If DataSketches has been installed on the host (using an RPM, DEB, "make install" into /usr/local, or some 
 way, then CMake's `find_package` command can be used like this:

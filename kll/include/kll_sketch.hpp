@@ -157,6 +157,7 @@ template<typename A> using vector_d = std::vector<double, AllocD<A>>;
 namespace kll_constants {
   const uint16_t DEFAULT_K = 200;
   const uint16_t DEFAULT_PREAMBLE = 0;
+  const uint16_t DEFAULT_INTS_SHORT = 2;
   const uint16_t DEFAULT_PREAMBLE_FLOAT = 5;
   const uint16_t DEFAULT_PREAMBLE_DOUBLE = 6;
   const uint16_t DEFAULT_PREAMBLE_INT = 7;
@@ -546,11 +547,6 @@ class kll_sketch {
     static const uint8_t FAMILY = 15;
 
     enum flags { IS_EMPTY, IS_LEVEL_ZERO_SORTED, IS_SINGLE_ITEM };
-
-    static const uint8_t PREAMBLE_INTS_SHORT = 2; // for empty and single item
-    static const uint8_t PREAMBLE_INTS_FULL = 5;
-
- 
 
     // for deserialization
     class item_deleter;
