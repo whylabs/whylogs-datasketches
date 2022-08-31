@@ -724,7 +724,6 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
     REQUIRE(sketch1.get_preamble() == 2);
     sketch1.update(1);
     sketch1.update(2);
-    REQUIRE(sketch1.get_preamble() == 6);
     std::stringstream s(std::ios::in | std::ios::out | std::ios::binary);
     auto bytes = sketch1.serialize();
     REQUIRE(bytes.size() == 60);
