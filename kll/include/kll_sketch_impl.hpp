@@ -189,8 +189,8 @@ void kll_sketch<T, C, S, A>::merge(FwdSk&& other) {
     throw std::invalid_argument("incompatible M: " + std::to_string(m_) + " and " + std::to_string(other.m_));
   }
   if (get_preamble() != other.get_preamble() 
-      && get_preamble() != PREAMBLE_INTS_SHORT 
-      && other.get_preamble() != PREAMBLE_INTS_SHORT) {
+      && get_preamble() != kll_constants::DEFAULT_INTS_SHORT 
+      && other.get_preamble() != kll_constants::DEFAULT_INTS_SHORT) {
       throw std::invalid_argument("incompatible preambles: " + std::to_string(get_preamble())
                                   + " and " + std::to_string(other.get_preamble()));
   }
@@ -224,11 +224,11 @@ uint16_t kll_sketch<T, C, S, A>::get_k() const {
 
 template<typename T, typename C, typename S, typename A>
 uint16_t kll_sketch<T, C, S, A>::get_preamble() const {
-  if (preamble_ != kll_constants::DEFAULT_PREAMBLE) {
+  if (preamble_ != kll_constants::DEFAULT_PREAMBLE && preamble_ != kll_constants::DEFAULT_INTS_SHORT) {
     return preamble_;
   }
   const bool is_single_item = n_ == 1;
-  return is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : resolve_preamble_ints();
+  return is_empty() || is_single_item ? kll_constants::DEFAULT_INTS_SHORT : resolve_preamble_ints();
 }
 
 template<typename T, typename C, typename S, typename A>
@@ -411,7 +411,7 @@ size_t kll_sketch<T, C, S, A>::get_max_serialized_size_bytes(uint16_t k, uint64_
 template<typename T, typename C, typename S, typename A>
 void kll_sketch<T, C, S, A>::serialize(std::ostream& os) const {
   const bool is_single_item = n_ == 1;
-  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : get_preamble());
+  const uint8_t preamble_ints(is_empty() || is_single_item ? kll_constants::DEFAULT_INTS_SHORT : get_preamble());
   write(os, preamble_ints);
   const uint8_t serial_version(is_single_item ? SERIAL_VERSION_2 : SERIAL_VERSION_1);
   write(os, serial_version);
@@ -454,7 +454,7 @@ vector_u8<A> kll_sketch<T, C, S, A>::serialize(unsigned header_size_bytes) const
   vector_u8<A> bytes(size, 0, allocator_);
   uint8_t* ptr = bytes.data() + header_size_bytes;
   const uint8_t* end_ptr = ptr + size;
-  const uint8_t preamble_ints(is_empty() || is_single_item ? PREAMBLE_INTS_SHORT : get_preamble());
+  const uint8_t preamble_ints(is_empty() || is_single_item ? kll_constants::DEFAULT_INTS_SHORT : get_preamble());
   ptr += copy_to_mem(preamble_ints, ptr);
   const uint8_t serial_version(is_single_item ? SERIAL_VERSION_2 : SERIAL_VERSION_1);
   ptr += copy_to_mem(serial_version, ptr);
@@ -488,7 +488,9 @@ vector_u8<A> kll_sketch<T, C, S, A>::serialize(unsigned header_size_bytes) const
     ptr += S().serialize(ptr, bytes_remaining, &items_[levels_[0]], get_num_retained());
   }
   const size_t delta = ptr - bytes.data();
-  if (delta != size) throw std::logic_error("serialized size mismatch: " + std::to_string(delta) + " != " + std::to_string(size));
+  if (delta != size) {
+    throw std::logic_error("serialized size mismatch: " + std::to_string(delta) + " != " + std::to_string(size));
+  }
   return bytes;
 }
 
@@ -687,7 +689,7 @@ kll_sketch<T, C, S, A>::kll_sketch(uint16_t k, uint16_t preamble, uint16_t min_k
     std::unique_ptr<T, item_deleter> max_value, bool is_level_zero_sorted):
 allocator_(levels.get_allocator()),
 k_(k),
-preamble_(preamble),
+preamble_(preamble == kll_constants::DEFAULT_INTS_SHORT ? kll_constants::DEFAULT_PREAMBLE : preamble),
 m_(DEFAULT_M),
 min_k_(min_k),
 n_(n),
@@ -1016,9 +1018,9 @@ void kll_sketch<T, C, S, A>::check_preamble_ints(uint8_t preamble_ints, uint8_t 
   const bool is_empty(flags_byte & (1 << flags::IS_EMPTY));
   const bool is_single_item(flags_byte & (1 << flags::IS_SINGLE_ITEM));
   if (is_empty || is_single_item) {
-    if (preamble_ints != PREAMBLE_INTS_SHORT) {
+    if (preamble_ints != kll_constants::DEFAULT_INTS_SHORT) {
       throw std::invalid_argument("Possible corruption: preamble ints must be "
-          + std::to_string(PREAMBLE_INTS_SHORT) + " for an empty or single item sketch: " + std::to_string(preamble_ints));
+          + std::to_string(kll_constants::DEFAULT_INTS_SHORT) + " for an empty or single item sketch: " + std::to_string(preamble_ints));
     }
   } else {
     uint8_t expected_preamble_ints = resolve_preamble_ints();

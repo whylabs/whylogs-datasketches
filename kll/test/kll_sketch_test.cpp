@@ -711,11 +711,22 @@ TEST_CASE("kll sketch", "[kll_sketch]") {
     REQUIRE(sketch1.get_preamble() == 5);
     sketch1.merge(single2);
     REQUIRE(sketch1.get_preamble() == 5);
+    REQUIRE(single2.get_preamble() == 2);
 
     REQUIRE(sketch1.get_min_value() == 0.0f);
     REQUIRE(sketch1.get_max_value() == 9.0f);
     REQUIRE(single_merge.get_min_value() == sketch1.get_min_value());
     REQUIRE(single_merge.get_max_value() == sketch1.get_max_value());
+  }
+
+  SECTION("double update override preamble to 2 size check") {
+    kll_double_sketch sketch1(200, 2, 0);
+    REQUIRE(sketch1.get_preamble() == 2);
+    sketch1.update(1);
+    sketch1.update(2);
+    std::stringstream s(std::ios::in | std::ios::out | std::ios::binary);
+    auto bytes = sketch1.serialize();
+    REQUIRE(bytes.size() == 60);
   }
 
   SECTION("merge double override preamble") {
