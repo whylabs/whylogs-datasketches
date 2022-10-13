@@ -44,7 +44,7 @@ jobs:
       matrix:
         config:
         - {
-            name: "Ubuntu Latest, GCC, aarch64",
+            name: "Ubuntu Latest, GCC, python3.8 aarch64",
             os: ubuntu-latest,
             arch: aarch64,
             cc: "gcc", cxx: "g++"
@@ -74,13 +74,11 @@ jobs:
         run: python -m cibuildwheel --output-dir dist
         env:
           CIBW_PRERELEASE_PYTHONS: True # enable Python 3.11
-          CIBW_SKIP: "*-win32"
-          CIBW_BUILD: "cp38-*64 cp39-*64 cp310-*64"
+          CIBW_SKIP: "*-win32 *musllinux*"
+          CIBW_BUILD: "cp38-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
           CIBW_ARCHS_LINUX: ${{ matrix.config.arch }}
-          CIBW_BEFORE_TEST: pip install pytest numpy
-          CIBW_TEST_COMMAND: 'python -m pytest {package}/python/tests'
 
       - uses: actions/upload-artifact@v2
         with:
