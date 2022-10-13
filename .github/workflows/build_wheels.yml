@@ -44,7 +44,7 @@ jobs:
       matrix:
         config:
         - {
-            name: "Ubuntu Latest, GCC, python3.9 3.10 aarch64",
+            name: "Ubuntu Latest, GCC, python3.7 3.11 aarch64",
             os: ubuntu-latest,
             arch: aarch64,
             cc: "gcc", cxx: "g++"
@@ -75,7 +75,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True # enable Python 3.11
           CIBW_SKIP: "*-win32 *musllinux*"
-          CIBW_BUILD: "cp39-*64 cp310-*64"
+          CIBW_BUILD: "cp37-*64 cp311-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
           CIBW_ARCHS_LINUX: ${{ matrix.config.arch }}
