@@ -44,31 +44,11 @@ jobs:
       matrix:
         config:
         - {
-            name: "MacOS Latest, Clang",
-            os: macos-latest,
-            arch: x86_64,
-            cc: "clang", cxx: "clang++"
-          }
-        - {
-            name: "Ubuntu Latest, GCC",
-            os: ubuntu-latest,
-            arch: x86_64,
-            cc: "gcc", cxx: "g++"
-          }
-        - {
             name: "Ubuntu Latest, GCC, aarch64",
             os: ubuntu-latest,
             arch: aarch64,
             cc: "gcc", cxx: "g++"
           }
-        - {
-            name: "Windows Latest, MSVC",
-            os: windows-latest,
-            arch: x86_64,
-            cc: "cl", cxx: "cl",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-            
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -95,7 +75,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True # enable Python 3.11
           CIBW_SKIP: "*-win32"
-          CIBW_BUILD: "cp36-*64 cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64"
+          CIBW_BUILD: "cp38-*64 cp39-*64 cp310-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
           CIBW_ARCHS_LINUX: ${{ matrix.config.arch }}
