@@ -20,6 +20,15 @@ jobs:
         with:
           submodules: true
           persist-credentials: false
+          
+      - name: Set up Perl environment
+        run: sudo apt-get install -y cpanminus
+          
+      - name: Install Capture::Tiny and DateTime modules
+        run: |
+          sudo cpanm Capture::Tiny
+          sudo cpanm DateTime
+
       - name: Download and install lcov
         run: |
           VERSION="2.1"
@@ -28,14 +37,19 @@ jobs:
           tar -xzf "lcov-$VERSION.tar.gz"
           cd "lcov-$VERSION"
           sudo make install
+
       - name: Configure
         run: cd build && cmake .. -DCOVERAGE=ON
+
       - name: Build unit tests
         run: cmake --build build
+
       - name: Run tests
         run: cmake --build build --target test
+
       - name: Generate coverage .info
         run: cmake --build build --target coverage_report
+
       - name: Post to Coveralls
         uses: coverallsapp/github-action@main
         with:
