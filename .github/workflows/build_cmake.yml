@@ -32,22 +32,16 @@ jobs:
             cc: "cl", cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
-        #- {
-        #    name: "Windows Latest, MinGW+gcc",
-        #    os: windows-latest,
-        #    cc: "gcc", cxx: "g++"
-        #  }
-            
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
           persist-credentials: false
       - name: Set up Python 3.x
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8' # 3.x grabs latest minor version of python3, but 3.9 not fully supported yet
+          python-version: '3.8' # 3.x grabs latest minor version of python3
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip setuptools wheel numpy tox pytest pybind11
       - name: Configure
@@ -57,8 +51,8 @@ jobs:
       - name: Run C++ tests
         run: cmake --build build --config Release --target ${{ matrix.config.test_target }}
       - name: Set up Python 3.x
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8' # 3.x grabs latest minor version of python3, but 3.9 not fully supported yet
+          python-version: '3.8' # 3.x grabs latest minor version of python3
       - name: Build and run Python tests
         run: python -m tox

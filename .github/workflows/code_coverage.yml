@@ -13,16 +13,16 @@ jobs:
   build:
     name: Coveralls
     runs-on: ubuntu-latest
-            
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
           persist-credentials: false
       - name: Download and install lcov
         run: |
-          VERSION="1.15"
+          VERSION="2.1"
           mkdir lcov_pkg && cd lcov_pkg
           wget "https://github.com/linux-test-project/lcov/releases/download/v$VERSION/lcov-$VERSION.tar.gz"
           tar -xzf "lcov-$VERSION.tar.gz"
@@ -37,7 +37,7 @@ jobs:
       - name: Generate coverage .info
         run: cmake --build build --target coverage_report
       - name: Post to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: build/lcov.info
