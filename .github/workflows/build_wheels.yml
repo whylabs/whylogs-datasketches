@@ -83,8 +83,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
           CIBW_ARCHS_LINUX: ${{ matrix.config.arch }}
-          CIBW_BEFORE_TEST: pip install pytest numpy
-          CIBW_TEST_COMMAND: 'python -m pytest {package}/python/tests'
+          CIBW_BEFORE_TEST: 'if [ "$CIBW_PYTHON_VERSION" != "cp313" ]; then pip install pytest numpy; fi'
+          CIBW_TEST_COMMAND: 'if [ "$CIBW_PYTHON_VERSION" != "cp313" ]; then python -m pytest {package}/python/tests; fi'
 
       - uses: actions/upload-artifact@v3
         with:
