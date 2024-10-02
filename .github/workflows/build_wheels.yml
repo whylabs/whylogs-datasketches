@@ -104,7 +104,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
           persist-credentials: false
 
       - name: Set up Python
@@ -123,7 +122,7 @@ jobs:
       - name: Build ARM wheels
         run: python -m cibuildwheel --output-dir dist
         env:
-          CIBW_PRERELEASE_PYTHONS: True
+          # CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_*"
           CIBW_BUILD: "*-${{ matrix.config.arch }}"
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
@@ -144,7 +143,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
           persist-credentials: false
 
       - name: Set up Python
@@ -163,9 +161,9 @@ jobs:
       - name: Build Musllinux ARM wheels
         run: python -m cibuildwheel --output-dir dist
         env:
-          CIBW_PRERELEASE_PYTHONS: True
+          # CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-manylinux*"
-          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_ARCHS_LINUX: "aarch64"
           CIBW_BEFORE_TEST: |
             if [ "$CIBW_PYTHON_VERSION" = "cp310" ]; then pip install pytest numpy; fi
