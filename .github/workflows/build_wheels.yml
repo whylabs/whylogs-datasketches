@@ -41,22 +41,24 @@ jobs:
       matrix:
         config:
         - {
-            name: "MacOS Latest, Clang",
+            name: "MacOS Latest (Intel)",
             os: macos-latest,
-            arch: x86_64,
-            cc: "clang", cxx: "clang++"
+            arch: macosx_x86_64
+          }
+        - {
+            name: "MacOS Latest (Apple Silicon)",
+            os: macos-latest,
+            arch: macosx_arm64
           }
         - {
             name: "Ubuntu Latest, GCC",
             os: ubuntu-latest,
             arch: x86_64,
-            cc: "gcc", cxx: "g++"
           }
         - {
             name: "Windows Latest, MSVC",
             os: windows-latest,
             arch: x86_64,
-            cc: "cl", cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
     steps:
@@ -79,22 +81,17 @@ jobs:
           python --version
           python -m cibuildwheel --output-dir dist
         env:
+          CIBW_ENVIRONMENT_MACOS: CMAKE_OSX_ARCHITECTURES=${{ matrix.config.arch == 'macosx_x86_64' && 'x86_64' || matrix.config.arch == 'macosx_arm64' && 'arm64' || '' }}
+          CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64 cp312-*64 cp313-*64"
+          MACOSX_DEPLOYMENT_TARGET: "10.14" # min supporting c++17
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32"
-          CIBW_BUILD: "cp36-*64 cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64 cp312-*64 cp313-*64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_ARCHS_MACOS: "x86_64 universal2"
           CIBW_ARCHS_LINUX: ${{ matrix.config.arch }}
           CIBW_BEFORE_TEST: 'if [ "$CIBW_PYTHON_VERSION" = "cp310" ]; then pip install pytest numpy; fi'
           CIBW_TEST_COMMAND: |
             if [ "$CIBW_PYTHON_VERSION" = "cp310" ]; then python -m pytest {package}/python/tests; fi
-
-      - name: Verify wheel architecture
-        run: |
-          echo "Inspecting wheel architecture..."
-          for whl in dist/*.whl; do
-            unzip -l "$whl"
-          done
 
       - uses: actions/upload-artifact@v4
         with:
@@ -128,7 +125,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_*"
-          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64 cp312-*64 cp313-*64"
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
           CIBW_ARCHS_LINUX: "aarch64"
           CIBW_BEFORE_TEST: |
@@ -168,7 +165,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-manylinux*"
-          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-*"
           CIBW_ARCHS_LINUX: "aarch64"
           CIBW_BEFORE_TEST: |
             if [ "$CIBW_PYTHON_VERSION" = "cp310" ]; then pip install pytest numpy; fi
