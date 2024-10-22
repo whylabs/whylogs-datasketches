@@ -55,6 +55,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: x86_64_wheels
           path: ./dist/*.whl
 
   build_wheels_manylinux:
@@ -95,6 +96,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: ManylinuxARMwheels
           path: ./dist/*.whl
 
   build_wheels_musllinux:
@@ -134,4 +136,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: MusllinuxARMwheels
           path: ./dist/*.whl
