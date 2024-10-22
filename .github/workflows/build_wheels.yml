@@ -82,7 +82,7 @@ jobs:
           python -m cibuildwheel --output-dir dist
         env:
           CIBW_ENVIRONMENT_MACOS: CMAKE_OSX_ARCHITECTURES=${{ matrix.config.arch == 'macosx_x86_64' && 'x86_64' || matrix.config.arch == 'macosx_arm64' && 'arm64' || '' }}
-          CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64 cp312-*64 cp313-*64"
+          CIBW_BUILD: "cp312-*64"
           MACOSX_DEPLOYMENT_TARGET: "10.14" # min supporting c++17
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32"
@@ -125,7 +125,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux_*"
-          CIBW_BUILD: "cp37-*64 cp38-*64 cp39-*64 cp310-*64 cp311-*64 cp312-*64 cp313-*64"
+          CIBW_BUILD: "cp312-*64"
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
           CIBW_ARCHS_LINUX: "aarch64"
           CIBW_BEFORE_TEST: |
@@ -165,7 +165,7 @@ jobs:
         env:
           CIBW_PRERELEASE_PYTHONS: True
           CIBW_SKIP: "*-win32 *-manylinux_i686 *-manylinux*"
-          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_BUILD: "cp312-*"
           CIBW_ARCHS_LINUX: "aarch64"
           CIBW_BEFORE_TEST: |
             if [ "$CIBW_PYTHON_VERSION" = "cp310" ]; then pip install pytest numpy; fi
