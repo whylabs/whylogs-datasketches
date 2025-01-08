@@ -3,7 +3,8 @@
 # This is not an Apache Sponsored Project
 Official repo: https://github.com/apache/datasketches-cpp
 
-This is a fork with some modified API to support whylogs use cases. It doesn't have any affiliation with the official Apache Datasketches project
+This is a fork with some modified API to support whylogs use cases. It doesn't have any affiliation with the official Apache Datasketches project.
+This contains logic for the serialization of datasketches used in whylogs profiles and is backwards compatible with serialized datasketches stored in WhyLabs platform with whylogs versions 0.0.1 through at least 1.6.4, and the wheels built in this repo were published to PyPI as https://pypi.org/project/whylogs-sketching/3.4.1.dev3/
 
 ---
 
