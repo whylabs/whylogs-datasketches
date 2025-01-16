@@ -16,7 +16,7 @@ jobs:
             
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
           persist-credentials: false
@@ -37,7 +37,7 @@ jobs:
       - name: Generate coverage .info
         run: cmake --build build --target coverage_report
       - name: Post to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: build/lcov.info
